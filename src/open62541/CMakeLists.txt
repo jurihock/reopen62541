@@ -1,0 +1,25 @@
+include(FetchContent)
+
+set(FETCHCONTENT_QUIET FALSE)
+
+FetchContent_Declare(OPEN62541_GIT
+  GIT_REPOSITORY https://github.com/open62541/open62541.git
+  GIT_TAG v1.1.3
+  GIT_PROGRESS FALSE
+)
+
+FetchContent_GetProperties(OPEN62541_GIT)
+
+string(TOLOWER OPEN62541_GIT OPEN62541_GIT)
+
+if(NOT ${OPEN62541_GIT}_POPULATED)
+
+  FetchContent_Populate(OPEN62541_GIT)
+
+  option(UA_ENABLE_STATUSCODE_DESCRIPTIONS "" ON)
+  option(UA_ENABLE_AMALGAMATION "" ON)
+  option(UA_ENABLE_DISCOVERY "" ON)
+
+  add_subdirectory(${${OPEN62541_GIT}_SOURCE_DIR} ${${OPEN62541_GIT}_BINARY_DIR})
+
+endif()
