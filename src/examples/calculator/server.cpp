@@ -56,7 +56,7 @@ calculator_server::calculator_server() : calculator(), ua::server(4840, "localho
 {
   add_log_callback([](UA_LogLevel level, UA_LogCategory category, const std::string& message)
   {
-    std::map<UA_LogLevel, std::string> levels
+    const std::map<UA_LogLevel, std::string> levels
     {
       { UA_LOGLEVEL_TRACE,   "trace"   },
       { UA_LOGLEVEL_DEBUG,   "debug"   },
@@ -66,7 +66,7 @@ calculator_server::calculator_server() : calculator(), ua::server(4840, "localho
       { UA_LOGLEVEL_FATAL,   "fatal"   },
     };
 
-    std::map<UA_LogCategory, std::string> categories
+    const std::map<UA_LogCategory, std::string> categories
     {
       { UA_LOGCATEGORY_NETWORK,        "network"  },
       { UA_LOGCATEGORY_SECURECHANNEL,  "channel"  },
@@ -78,20 +78,21 @@ calculator_server::calculator_server() : calculator(), ua::server(4840, "localho
     };
 
     std::cout
-      << "[" << levels[level]
-      << " " << categories[category]
+      << "SERVER "
+      << "[" << levels.at(level)
+      << " " << categories.at(category)
       << "] " << message
       << std::endl;
   });
 
   add_object(
-    "calculator",
+    "Calculator",
     "The Bill Tip calculator");
 
   add_property<double>(
     "Bill",
     "The bill amount",
-    { "calculator" },
+    { "Calculator" },
     [this](ua::output& output)
     {
       output << bill;
@@ -108,7 +109,7 @@ calculator_server::calculator_server() : calculator(), ua::server(4840, "localho
   add_property<double>(
     "Tip",
     "The tip percentage",
-    { "calculator" },
+    { "Calculator" },
     [this](ua::output& output)
     {
       output << tip;
@@ -125,7 +126,7 @@ calculator_server::calculator_server() : calculator(), ua::server(4840, "localho
   add_method(
     "Calculate",
     "Calculate the bill tip",
-    { "calculator" },
+    { "Calculator" },
     {},
     { ua::argument::scalar<double>("Result", "The tip amount") },
     [this](const ua::input& input, ua::output& output)

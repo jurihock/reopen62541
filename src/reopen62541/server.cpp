@@ -6,18 +6,18 @@ ua::server::server(const int portnumber, const std::string& hostname, const std:
   server_instance = std::shared_ptr<UA_Server>(UA_Server_new(), UA_Server_delete);
   server_config = UA_Server_getConfig(server_instance.get());
 
-  const auto status = UA_ServerConfig_setMinimal(server_config, portnumber, nullptr);
-
-  if (status != UA_STATUSCODE_GOOD)
-  {
-    throw ua::server_error(status);
-  }
-
   // custom logger
   {
     server_config->logger.log = log_callback_handler;
     server_config->logger.context = this;
     server_config->logger.clear = nullptr;
+  }
+
+  const auto status = UA_ServerConfig_setMinimal(server_config, portnumber, nullptr);
+
+  if (status != UA_STATUSCODE_GOOD)
+  {
+    throw ua::server_error(status);
   }
 
   // custom configs
@@ -397,7 +397,12 @@ void ua::server::add_method(
   }
 }
 
-void ua::server::log_callback_handler(void* context, UA_LogLevel level, UA_LogCategory category, const char* format, va_list args)
+void ua::server::log_callback_handler(
+  void* context,
+  UA_LogLevel level,
+  UA_LogCategory category,
+  const char* format,
+  va_list args)
 {
   if (context == nullptr)
   {

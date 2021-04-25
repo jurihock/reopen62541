@@ -2,8 +2,6 @@
 
 #include <open62541.h>
 
-#include <string>
-
 namespace ua
 {
   class server_error : public std::exception
@@ -11,19 +9,8 @@ namespace ua
   public:
 
     server_error(UA_StatusCode code) :
-      std::exception(to_string(code).c_str())
+      std::exception(UA_StatusCode_name(code))
     {
-    }
-
-  private:
-
-    static std::string to_string(UA_StatusCode code)
-    {
-      #ifdef UA_ENABLE_STATUSCODE_DESCRIPTIONS
-      return UA_StatusCode_name(code);
-      #else
-      return std::to_string(code);
-      #endif
     }
   };
 
@@ -32,19 +19,8 @@ namespace ua
   public:
 
     client_error(UA_StatusCode code) :
-      std::exception(to_string(code).c_str())
+      std::exception(std::string(UA_StatusCode_name(code)).c_str())
     {
-    }
-
-  private:
-
-    static std::string to_string(UA_StatusCode code)
-    {
-      #ifdef UA_ENABLE_STATUSCODE_DESCRIPTIONS
-      return UA_StatusCode_name(code);
-      #else
-      return std::to_string(code);
-      #endif
     }
   };
 }

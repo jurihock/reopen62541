@@ -10,12 +10,16 @@
 #include <open62541.h>
 
 #include <algorithm>
+#include <cstdarg>
 #include <memory>
 #include <string>
 #include <vector>
 
 namespace ua
 {
+  typedef void (client_log_callback)(UA_LogLevel level, UA_LogCategory category, const std::string& message);
+  typedef std::vector<std::function<ua::client_log_callback>> client_log_callback_vector;
+
   typedef void (client_method_request_callback)(ua::output& request);
   typedef void (client_method_response_callback)(const ua::input& response);
 
@@ -23,8 +27,7 @@ namespace ua
   {
   public:
 
-    client(const std::string& url);
-    client(const std::string& url, int timeout);
+    client(const std::string& url, int timeout = 5000);
     ~client();
 
     const std::string& url() const;
@@ -33,6 +36,9 @@ namespace ua
 
     void connect();
     void disconnect();
+
+    void add_log_callback(
+      std::function<ua::client_log_callback> callback);
 
     void call(
       const std::string& name,
@@ -55,6 +61,19 @@ namespace ua
     const std::string client_url;
     volatile UA_Boolean client_connected;
 
-    void get_method_nargs(const std::string& name, const std::vector<std::string>& path, size_t* number_of_inputs, size_t* number_of_outputs);
+    ua::client_log_callback_vector client_log_callbacks;
+
+    static void log_callback_handler(
+      void* context,
+      UA_LogLevel level,
+      UA_LogCategory category,
+      const char* format,
+      va_list args);
+
+    void get_method_nargs(
+      const std::string& name,
+      const std::vector<std::string>& path,
+      size_t* number_of_inputs,
+      size_t* number_of_outputs);
   };
 }

@@ -1,24 +1,17 @@
 #include <reopen62541/client.h>
 
-ua::client::client(const std::string& url) :
-  client_url(url), client_connected(false)
-{
-  client_instance = std::shared_ptr<UA_Client>(UA_Client_new(), UA_Client_delete);
-  client_config = UA_Client_getConfig(client_instance.get());
-  
-  const auto status = UA_ClientConfig_setDefault(client_config);
-
-  if (status != UA_STATUSCODE_GOOD)
-  {
-    throw std::runtime_error("Unable to bootstrap the OPC UA client instance!");
-  }
-}
-
 ua::client::client(const std::string& url, int timeout) :
   client_url(url), client_connected(false)
 {
   client_instance = std::shared_ptr<UA_Client>(UA_Client_new(), UA_Client_delete);
   client_config = UA_Client_getConfig(client_instance.get());
+
+  // custom logger
+  {
+    client_config->logger.log = log_callback_handler;
+    client_config->logger.context = this;
+    client_config->logger.clear = nullptr;
+  }
   
   const auto status = UA_ClientConfig_setDefault(client_config);
   
@@ -26,7 +19,8 @@ ua::client::client(const std::string& url, int timeout) :
   {
     throw std::runtime_error("Unable to bootstrap the OPC UA client instance!");
   }
-  
+
+  // custom timeout
   client_config->timeout = timeout;
 }
 
@@ -104,6 +98,12 @@ void ua::client::disconnect()
   }
 }
 
+void ua::client::add_log_callback(
+  std::function<ua::client_log_callback> callback)
+{
+  client_log_callbacks.push_back(callback);
+}
+
 void ua::client::call(
   const std::string& name,
   const std::vector<std::string>& path,
@@ -161,7 +161,39 @@ void ua::client::call(
   UA_Array_delete(outputs, noutputs, &UA_TYPES[UA_TYPES_VARIANT]);
 }
 
-void ua::client::get_method_nargs(const std::string& name, const std::vector<std::string>& path, size_t* number_of_inputs, size_t* number_of_outputs)
+void ua::client::log_callback_handler(
+  void* context,
+  UA_LogLevel level,
+  UA_LogCategory category,
+  const char* format,
+  va_list args)
+{
+  if (context == nullptr)
+  {
+    return;
+  }
+
+  std::va_list argscopy;
+  va_copy(argscopy, args);
+
+  const auto length = std::vsnprintf(nullptr, 0, format, argscopy) + 1; // incl. \0
+
+  std::vector<char> buffer(length, 0);
+  std::vsnprintf(buffer.data(), length, format, args);
+
+  const std::string message(buffer.begin(), buffer.end());
+
+  for (const auto& log : static_cast<ua::client*>(context)->client_log_callbacks)
+  {
+    log(level, category, message);
+  }
+}
+
+void ua::client::get_method_nargs(
+  const std::string& name,
+  const std::vector<std::string>& path,
+  size_t* number_of_inputs,
+  size_t* number_of_outputs)
 {
   const auto node = UID(path, name);
   const auto node_id = UA_NODEID_STRING_ALLOC(NS, STRINGS(node)); // ALLOC
