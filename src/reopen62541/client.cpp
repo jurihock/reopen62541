@@ -1,7 +1,10 @@
 #include <reopen62541/client.h>
 
-ua::client::client(const std::string& url, int timeout) :
-  client_url(url), client_connected(false)
+ua::client::client(const int portnumber, const std::string& hostname, const int timeout) :
+  client_portnumber(portnumber),
+  client_hostname(hostname),
+  client_url("opc.tcp://" + hostname + ":" + std::to_string(portnumber)),
+  client_connected(false)
 {
   client_instance = std::shared_ptr<UA_Client>(UA_Client_new(), UA_Client_delete);
   client_config = UA_Client_getConfig(client_instance.get());
@@ -26,6 +29,16 @@ ua::client::client(const std::string& url, int timeout) :
 
 ua::client::~client()
 {
+}
+
+int ua::client::portnumber() const
+{
+  return client_portnumber;
+}
+
+const std::string& ua::client::hostname() const
+{
+  return client_hostname;
 }
 
 const std::string& ua::client::url() const

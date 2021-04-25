@@ -27,9 +27,11 @@ namespace ua
   {
   public:
 
-    client(const std::string& url, int timeout = 5000);
+    client(const int portnumber, const std::string& hostname, const int timeout = 5000);
     ~client();
 
+    int portnumber() const;
+    const std::string& hostname() const;
     const std::string& url() const;
 
     bool connected() const;
@@ -58,6 +60,8 @@ namespace ua
 
   private:
 
+    const int client_portnumber;
+    const std::string client_hostname;
     const std::string client_url;
     volatile UA_Boolean client_connected;
 

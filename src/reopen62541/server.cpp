@@ -1,7 +1,12 @@
 #include <reopen62541/server.h>
 
 ua::server::server(const int portnumber, const std::string& hostname, const std::string& name, const std::string& uri) :
-  server_portnumber(portnumber), server_hostname(hostname), server_name(name), server_uri(uri), server_running(false), server_runner(nullptr)
+  server_portnumber(portnumber),
+  server_hostname(hostname),
+  server_name(name),
+  server_uri(uri),
+  server_running(false),
+  server_runner(nullptr)
 {
   server_instance = std::shared_ptr<UA_Server>(UA_Server_new(), UA_Server_delete);
   server_config = UA_Server_getConfig(server_instance.get());
