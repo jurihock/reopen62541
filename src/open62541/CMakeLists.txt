@@ -4,7 +4,7 @@ set(FETCHCONTENT_QUIET FALSE)
 
 FetchContent_Declare(OPEN62541_GIT
   GIT_REPOSITORY https://github.com/open62541/open62541.git
-  GIT_TAG v1.1.3
+  GIT_TAG v1.2.1
   GIT_PROGRESS FALSE
 )
 
