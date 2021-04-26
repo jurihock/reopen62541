@@ -47,7 +47,7 @@ struct calculator_server : calculator_implementation, ua::server
       "Calculator",
       "The Bill Tip Calculator");
 
-    add_property<double>(
+    add_variable<double>(
       "Bill",
       "The bill amount",
       { "Calculator" },
@@ -64,7 +64,7 @@ struct calculator_server : calculator_implementation, ua::server
                   << std::endl;
       });
 
-    add_property<double>(
+    add_variable<double>(
       "Tip",
       "The tip percentage",
       { "Calculator" },

@@ -25,11 +25,11 @@ namespace ua
   typedef void (server_log_callback)(UA_LogLevel level, UA_LogCategory category, const std::string& message);
   typedef std::vector<std::function<ua::server_log_callback>> server_log_callback_vector;
 
-  typedef void (server_property_getter_callback)(ua::variant& output);
-  typedef std::map<std::string, std::function<ua::server_property_getter_callback>> server_property_getter_callback_map;
+  typedef void (server_variable_getter_callback)(ua::variant& output);
+  typedef std::map<std::string, std::function<ua::server_variable_getter_callback>> server_variable_getter_callback_map;
 
-  typedef void (server_property_setter_callback)(const ua::variant& input);
-  typedef std::map<std::string, std::function<ua::server_property_setter_callback>> server_property_setter_callback_map;
+  typedef void (server_variable_setter_callback)(const ua::variant& input);
+  typedef std::map<std::string, std::function<ua::server_variable_setter_callback>> server_variable_setter_callback_map;
 
   typedef void (server_method_callback)(const ua::variant& input, ua::variant& output);
   typedef std::map<std::string, std::function<ua::server_method_callback>> server_method_callback_map;
@@ -65,7 +65,7 @@ namespace ua
       const std::string& description,
       const std::vector<std::string>& path = std::vector<std::string>());
 
-    void add_property(
+    void add_variable(
       const std::string& name,
       const std::string& description,
       const std::vector<std::string>& path,
@@ -74,7 +74,7 @@ namespace ua
       UA_DataSource callback);
 
     template<typename T>
-    void add_property(
+    void add_variable(
       const std::string& name,
       const std::string& description,
       const std::vector<std::string>& path,
@@ -83,50 +83,50 @@ namespace ua
       const uint32_t datatype = ua::convert::to_ua_data_type<T>();
       const int32_t valuerank = ua::convert::to_ua_value_rank<T>();
       
-      add_property(name, description, path, datatype, valuerank, callback);
+      add_variable(name, description, path, datatype, valuerank, callback);
     }
 
     template<typename T>
-    void add_property(
+    void add_variable(
       const std::string& name,
       const std::string& description,
       const std::vector<std::string>& path,
-      std::function<ua::server_property_getter_callback> getter)
+      std::function<ua::server_variable_getter_callback> getter)
     {
       const auto node = ua::convert::to_delimited_string(path, name);
 
-      property_getter_callbacks[node] = getter;
-      property_setter_callbacks[node] = nullptr;
+      server_variable_getter_callbacks[node] = getter;
+      server_variable_setter_callbacks[node] = nullptr;
 
       UA_DataSource callback;
       {
-        callback.read = property_getter_callback_handler;
+        callback.read = variable_getter_callback_handler;
         callback.write = nullptr;
       }
 
-      add_property<T>(name, description, path, callback);
+      add_variable<T>(name, description, path, callback);
     };
 
     template<typename T>
-    void add_property(
+    void add_variable(
       const std::string& name,
       const std::string& description,
       const std::vector<std::string>& path,
-      std::function<ua::server_property_getter_callback> getter,
-      std::function<ua::server_property_setter_callback> setter)
+      std::function<ua::server_variable_getter_callback> getter,
+      std::function<ua::server_variable_setter_callback> setter)
     {
       const auto node = UID(path, name);
 
-      server_property_getter_callbacks[node] = getter;
-      server_property_setter_callbacks[node] = setter;
+      server_variable_getter_callbacks[node] = getter;
+      server_variable_setter_callbacks[node] = setter;
 
       UA_DataSource callback;
       {
-        callback.read = property_getter_callback_handler;
-        callback.write = property_setter_callback_handler;
+        callback.read = variable_getter_callback_handler;
+        callback.write = variable_setter_callback_handler;
       }
 
-      add_property<T>(name, description, path, callback);
+      add_variable<T>(name, description, path, callback);
     };
 
     void add_method(
@@ -186,8 +186,8 @@ namespace ua
     std::shared_ptr<std::thread> server_runner;
 
     ua::server_log_callback_vector server_log_callbacks;
-    ua::server_property_getter_callback_map server_property_getter_callbacks;
-    ua::server_property_setter_callback_map server_property_setter_callbacks;
+    ua::server_variable_getter_callback_map server_variable_getter_callbacks;
+    ua::server_variable_setter_callback_map server_variable_setter_callbacks;
     ua::server_method_callback_map server_method_callbacks;
 
     static void log_callback_handler(
@@ -197,7 +197,7 @@ namespace ua
       const char* format,
       va_list args);
 
-    static UA_StatusCode property_getter_callback_handler(
+    static UA_StatusCode variable_getter_callback_handler(
       UA_Server* server,
       const UA_NodeId* sessionId, void* sessionContext,
       const UA_NodeId* variableId, void* variableContext,
@@ -205,7 +205,7 @@ namespace ua
       const UA_NumericRange* range,
       UA_DataValue* value);
 
-    static UA_StatusCode property_setter_callback_handler(
+    static UA_StatusCode variable_setter_callback_handler(
       UA_Server* server,
       const UA_NodeId* sessionId, void* sessionContext,
       const UA_NodeId* variableId, void* variableContext,

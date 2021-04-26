@@ -95,7 +95,7 @@ void ua::client::add_log_callback(
 void ua::client::get(
   const std::string& name,
   const std::vector<std::string>& path,
-  std::function<ua::client_property_getter_callback> getter)
+  std::function<ua::client_variable_getter_callback> getter)
 {
   UA_Variant output;
   UA_Variant_init(&output);
@@ -127,7 +127,7 @@ void ua::client::get(
 void ua::client::set(
   const std::string& name,
   const std::vector<std::string>& path,
-  std::function<ua::client_property_setter_callback> setter)
+  std::function<ua::client_variable_setter_callback> setter)
 {
   UA_Variant input;
   UA_Variant_init(&input);

@@ -19,8 +19,8 @@ namespace ua
   typedef void (client_log_callback)(UA_LogLevel level, UA_LogCategory category, const std::string& message);
   typedef std::vector<std::function<ua::client_log_callback>> client_log_callback_vector;
 
-  typedef void (client_property_getter_callback)(const ua::variant& output);
-  typedef void (client_property_setter_callback)(ua::variant& input);
+  typedef void (client_variable_getter_callback)(const ua::variant& output);
+  typedef void (client_variable_setter_callback)(ua::variant& input);
 
   typedef void (client_method_request_callback)(ua::variant& input);
   typedef void (client_method_response_callback)(const ua::variant& output);
@@ -47,12 +47,12 @@ namespace ua
     void get(
       const std::string& name,
       const std::vector<std::string>& path,
-      std::function<ua::client_property_getter_callback> getter);
+      std::function<ua::client_variable_getter_callback> getter);
 
     void set(
       const std::string& name,
       const std::vector<std::string>& path,
-      std::function<ua::client_property_setter_callback> setter);
+      std::function<ua::client_variable_setter_callback> setter);
 
     void call(
       const std::string& name,

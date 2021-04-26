@@ -220,7 +220,7 @@ void ua::server::add_object(
   }
 }
 
-void ua::server::add_property(
+void ua::server::add_variable(
   const std::string& name,
   const std::string& description,
   const std::vector<std::string>& path,
@@ -358,7 +358,7 @@ void ua::server::log_callback_handler(
   }
 }
 
-UA_StatusCode ua::server::property_getter_callback_handler(
+UA_StatusCode ua::server::variable_getter_callback_handler(
   UA_Server* server,
   const UA_NodeId* sessionId, void* sessionContext,
   const UA_NodeId* variableId, void* variableContext,
@@ -376,7 +376,7 @@ UA_StatusCode ua::server::property_getter_callback_handler(
 
   try
   {
-    const auto& callback = context->server_property_getter_callbacks[node];
+    const auto& callback = context->server_variable_getter_callbacks[node];
 
     ua::variant output_of_callback(&value->value, 1);
 
@@ -388,7 +388,7 @@ UA_StatusCode ua::server::property_getter_callback_handler(
   }
   catch (const std::exception& exception)
   {
-    const std::string message = "Exception in property getter " + node + ": " + exception.what();
+    const std::string message = "Exception in variable getter " + node + ": " + exception.what();
 
     for (const auto& log : context->server_log_callbacks)
     {
@@ -399,7 +399,7 @@ UA_StatusCode ua::server::property_getter_callback_handler(
   }
   catch (...)
   {
-    const std::string message = "Unknown exception in property getter " + node + "!";
+    const std::string message = "Unknown exception in variable getter " + node + "!";
 
     for (const auto& log : context->server_log_callbacks)
     {
@@ -412,7 +412,7 @@ UA_StatusCode ua::server::property_getter_callback_handler(
   return UA_STATUSCODE_BADINTERNALERROR;
 }
 
-UA_StatusCode ua::server::property_setter_callback_handler(
+UA_StatusCode ua::server::variable_setter_callback_handler(
   UA_Server* server,
   const UA_NodeId* sessionId, void* sessionContext,
   const UA_NodeId* variableId, void* variableContext,
@@ -429,7 +429,7 @@ UA_StatusCode ua::server::property_setter_callback_handler(
 
   try
   {
-    const auto& callback = context->server_property_setter_callbacks[node];
+    const auto& callback = context->server_variable_setter_callbacks[node];
 
     ua::variant input_of_callback(&value->value, 1);
 
@@ -439,7 +439,7 @@ UA_StatusCode ua::server::property_setter_callback_handler(
   }
   catch (const std::exception& exception)
   {
-    const std::string message = "Exception in property setter " + node + ": " + exception.what();
+    const std::string message = "Exception in variable setter " + node + ": " + exception.what();
 
     for (const auto& log : context->server_log_callbacks)
     {
@@ -450,7 +450,7 @@ UA_StatusCode ua::server::property_setter_callback_handler(
   }
   catch (...)
   {
-    const std::string message = "Unknown exception in property setter " + node + "!";
+    const std::string message = "Unknown exception in variable setter " + node + "!";
 
     for (const auto& log : context->server_log_callbacks)
     {
