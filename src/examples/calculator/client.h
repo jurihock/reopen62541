@@ -46,31 +46,49 @@ struct calculator_client : calculator_interface, ua::client
 
   double bill() override
   {
-    return 0; // TODO
+    double bill;
+
+    get("Bill", { "Calculator" }, [&](const ua::variant& output)
+    {
+      bill = output;
+    });
+
+    return bill;
   }
 
   void bill(double bill) override
   {
-    return; // TODO
+    set("Bill", { "Calculator" }, [&](ua::variant& input)
+    {
+      input = bill;
+    });
   }
 
   double tip() override
   {
-    return 0; // TODO
+    double tip;
+
+    get("Tip", { "Calculator" }, [&](const ua::variant& output)
+    {
+      tip = output;
+    });
+
+    return tip;
   }
 
   void tip(double tip) override
   {
-    return; // TODO
+    set("Tip", { "Calculator" }, [&](ua::variant& input)
+    {
+      input = tip;
+    });
   }
 
   double calculate() override
   {
-    double result = 0;
+    double result;
 
-    call(
-      "Calculate",
-      { "Calculator" },
+    call("Calculate", { "Calculator" },
       [&](ua::variant& input)
       {
       },
