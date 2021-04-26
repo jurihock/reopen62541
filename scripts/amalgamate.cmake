@@ -1,7 +1,7 @@
 set(SRC "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/reopen62541")
 set(DST "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}")
 
-set(FILES convert error strings uid arguments variant client server)
+set(FILES convert error strings uid argument variant client server)
 set(TYPES h cpp)
 
 foreach(TYPE ${TYPES})
@@ -17,7 +17,7 @@ foreach(TYPE ${TYPES})
 
     message("Processing ${SRC}/${FILE}.${TYPE}")
 
-    file(READ "${SRC}/${FILE}.h" LINES)
+    file(READ "${SRC}/${FILE}.${TYPE}" LINES)
 
     string(REPLACE ";" "\;" LINES "${LINES}")
     string(REPLACE "\n" "\n;" LINES "${LINES}")
@@ -41,6 +41,10 @@ foreach(TYPE ${TYPES})
       endif()
 
       if("${LINE}" MATCHES "^namespace")
+        set(SKIP_EMPTY_LINES 0)
+      endif()
+
+      if("${LINE}" MATCHES "^ua::")
         set(SKIP_EMPTY_LINES 0)
       endif()
 
@@ -79,8 +83,10 @@ foreach(TYPE ${TYPES})
     list(JOIN HEAD "" HEAD)
     list(JOIN BODY "" BODY)
 
-    string(STRIP "${HEAD}\n${BODY}" CONTENT)
-    file(WRITE "${DST}/reopen62541.h" "${CONTENT}\n")
+    string(STRIP "${HEAD}" HEAD)
+    string(STRIP "${BODY}" BODY)
+
+    file(WRITE "${DST}/reopen62541.h" "${HEAD}\n\n${BODY}\n")
 
   endif()
 
@@ -94,8 +100,10 @@ foreach(TYPE ${TYPES})
     list(JOIN HEAD "" HEAD)
     list(JOIN BODY "" BODY)
 
-    string(STRIP "${HEAD}\n${BODY}" CONTENT)
-    file(WRITE "${DST}/reopen62541.cpp" "${CONTENT}\n")
+    string(STRIP "${HEAD}" HEAD)
+    string(STRIP "${BODY}" BODY)
+
+    file(WRITE "${DST}/reopen62541.cpp" "${HEAD}\n\n${BODY}\n")
 
   endif()
 
