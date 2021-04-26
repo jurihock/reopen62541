@@ -34,6 +34,9 @@ namespace ua
   typedef void (server_method_callback)(const ua::variant& input, ua::variant& output);
   typedef std::map<std::string, std::function<ua::server_method_callback>> server_method_callback_map;
 
+  /**
+   * Represents an UA_Server instance.
+   */
   class server
   {
   public:

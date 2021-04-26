@@ -1,0 +1,13 @@
+PROJECT_NAME           = "reopen62541"
+PROJECT_BRIEF          = "C++ wrapper around the open62541.org implementation of OPC UA"
+USE_MDFILE_AS_MAINPAGE = README.md
+INPUT                  = ..\..\README.md .
+OUTPUT_DIRECTORY       = ..\..\.docs
+HTML_OUTPUT            = reopen62541
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
+FILE_PATTERNS          = *.h *.cpp
+RECURSIVE              = YES
+EXTRACT_STATIC         = YES
+QUIET                  = YES
+WARN_IF_UNDOCUMENTED   = NO

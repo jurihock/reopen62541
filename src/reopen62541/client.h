@@ -25,6 +25,9 @@ namespace ua
   typedef void (client_method_request_callback)(ua::variant& input);
   typedef void (client_method_response_callback)(const ua::variant& output);
 
+  /**
+   * Represents an UA_Client instance.
+   */
   class client
   {
   public:
