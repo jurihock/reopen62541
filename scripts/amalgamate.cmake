@@ -15,7 +15,7 @@ foreach(TYPE ${TYPES})
       continue()
     endif()
 
-    message("Processing ${SRC}/${FILE}.${TYPE}")
+    message("Amalgamate ${SRC}/${FILE}.${TYPE}")
 
     file(READ "${SRC}/${FILE}.${TYPE}" LINES)
 
