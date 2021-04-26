@@ -89,8 +89,9 @@ struct calculator_server : calculator_implementation, ua::server
       { ua::argument::scalar<double>("Result", "The tip amount") },
       [&](const ua::variant& input, ua::variant& output)
       {
-        std::cout << "Calculating the bill tip"
+        std::cout << "Calculating the bill tip..."
                   << std::endl;
+
         output = calculate();
       });
   }

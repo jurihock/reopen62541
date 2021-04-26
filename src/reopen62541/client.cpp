@@ -20,7 +20,7 @@ ua::client::client(const int portnumber, const std::string& hostname, const int 
   
   if (status != UA_STATUSCODE_GOOD)
   {
-    throw std::runtime_error("Unable to bootstrap the OPC UA client instance!");
+    throw ua::client_error(status);
   }
 
   // custom timeout
@@ -29,6 +29,7 @@ ua::client::client(const int portnumber, const std::string& hostname, const int 
 
 ua::client::~client()
 {
+  disconnect();
 }
 
 int ua::client::portnumber() const
@@ -55,59 +56,33 @@ void ua::client::connect()
 {
   if (client_connected)
   {
-    throw std::runtime_error("client is already connected!");
+    return;
   }
 
-  UA_StatusCode status;
+  const auto status = UA_Client_connect(client_instance.get(), client_url.c_str());
 
-  try
-  {
-    status = UA_Client_connect(client_instance.get(), client_url.c_str());
-
-    client_connected = (status == UA_STATUSCODE_GOOD);
-  }
-  catch (const std::exception& exception)
-  {
-    throw exception;
-  }
-  catch (...)
-  {
-    throw std::runtime_error("Don't know the exception! :~(");
-  }
+  client_connected = (status == UA_STATUSCODE_GOOD);
 
   if (status != UA_STATUSCODE_GOOD)
   {
-    throw std::runtime_error(UA_StatusCode_name(status));
+    throw ua::client_error(status);
   }
 }
 
 void ua::client::disconnect()
 {
-  if (client_connected == false)
+  if (!client_connected)
   {
     return;
   }
 
-  client_connected = false;
+  const auto status = UA_Client_disconnect(client_instance.get());
 
-  UA_StatusCode status;
-
-  try
-  {
-    status = UA_Client_disconnect(client_instance.get());
-  }
-  catch (const std::exception& exception)
-  {
-    throw exception;
-  }
-  catch (...)
-  {
-    throw std::runtime_error("Don't know the exception! :~(");
-  }
+  client_connected = true;
 
   if (status != UA_STATUSCODE_GOOD)
   {
-    throw std::runtime_error(UA_StatusCode_name(status));
+    throw ua::client_error(status);
   }
 }
 
@@ -122,46 +97,29 @@ void ua::client::get(
   const std::vector<std::string>& path,
   std::function<ua::client_property_getter_callback> getter)
 {
+  UA_Variant output;
+  UA_Variant_init(&output);
+
   const auto node = UID(path, name);
   const auto parent = UID(path);
 
   const auto node_id = UA_NODEID_STRING(NS, STRINGS(node));
   const auto parent_id = UA_NODEID_STRING(NS, STRINGS(parent));
 
-  UA_Variant output;
-  UA_Variant_init(&output);
-
-  UA_StatusCode status;
-
-  try
-  {
-    const auto node = UID(path, name);
-    const auto parent = UID(path);
-
-    const auto node_id = UA_NODEID_STRING(NS, STRINGS(node));
-    const auto parent_id = UA_NODEID_STRING(NS, STRINGS(parent));
-
-    status = UA_Client_readValueAttribute(
-      client_instance.get(),
-      node_id,
-      &output);
-  }
-  catch (const std::exception& exception)
-  {
-    throw exception;
-  }
-  catch (...)
-  {
-    throw std::runtime_error("Don't know the exception! :~(");
-  }
+  const auto status = UA_Client_readValueAttribute(
+    client_instance.get(),
+    node_id,
+    &output);
 
   if (status != UA_STATUSCODE_GOOD)
   {
+    UA_Variant_clear(&output);
+
     throw ua::client_error(status);
   }
 
-  ua::variant output_of_callback(&output, 1);
-  getter(output_of_callback);
+  ua::variant getter_variant(&output, 1);
+  getter(getter_variant);
 
   UA_Variant_clear(&output);
 }
@@ -171,45 +129,27 @@ void ua::client::set(
   const std::vector<std::string>& path,
   std::function<ua::client_property_setter_callback> setter)
 {
+  UA_Variant input;
+  UA_Variant_init(&input);
+
+  ua::variant setter_variant(&input, 1);
+  setter(setter_variant);
+
   const auto node = UID(path, name);
   const auto parent = UID(path);
 
   const auto node_id = UA_NODEID_STRING(NS, STRINGS(node));
   const auto parent_id = UA_NODEID_STRING(NS, STRINGS(parent));
 
-  UA_Variant input;
-  UA_Variant_init(&input);
-
-  ua::variant input_of_callback(&input, 1);
-  setter(input_of_callback);
-
-  UA_StatusCode status;
-
-  try
-  {
-    const auto node = UID(path, name);
-    const auto parent = UID(path);
-
-    const auto node_id = UA_NODEID_STRING(NS, STRINGS(node));
-    const auto parent_id = UA_NODEID_STRING(NS, STRINGS(parent));
-
-    status = UA_Client_writeValueAttribute(
-      client_instance.get(),
-      node_id,
-      &input);
-  }
-  catch (const std::exception& exception)
-  {
-    throw exception;
-  }
-  catch (...)
-  {
-    throw std::runtime_error("Don't know the exception! :~(");
-  }
+  const auto status = UA_Client_writeValueAttribute(
+    client_instance.get(),
+    node_id,
+    &input);
 
   if (status != UA_STATUSCODE_GOOD)
   {
-    std::string foo = ua::client_error(status).what();
+    UA_Variant_clear(&input);
+
     throw ua::client_error(status);
   }
 
@@ -227,49 +167,40 @@ void ua::client::call(
   get_method_nargs(name, path, &ninputs, &noutputs);
 
   std::vector<UA_Variant> inputs(ninputs);
-  std::for_each(inputs.begin(), inputs.end(),
-    [](UA_Variant& input) { UA_Variant_init(&input); });
+  for (auto& input : inputs) UA_Variant_init(&input);
 
-  ua::variant input_of_callback(inputs.data(), inputs.size());
-  request(input_of_callback);
+  ua::variant request_variant(inputs.data(), inputs.size());
+  request(request_variant);
 
   UA_Variant* outputs;
-  UA_StatusCode status;
 
-  try
-  {
-    const auto node = UID(path, name);
-    const auto parent = UID(path);
+  const auto node = UID(path, name);
+  const auto parent = UID(path);
 
-    const auto node_id = UA_NODEID_STRING(NS, STRINGS(node));
-    const auto parent_id = UA_NODEID_STRING(NS, STRINGS(parent));
+  const auto node_id = UA_NODEID_STRING(NS, STRINGS(node));
+  const auto parent_id = UA_NODEID_STRING(NS, STRINGS(parent));
 
-    status = UA_Client_call(
-      client_instance.get(),
-      parent_id,
-      node_id,
-      inputs.size(),
-      inputs.data(),
-      &noutputs,
-      &outputs);
-  }
-  catch (const std::exception& exception)
-  {
-    throw exception;
-  }
-  catch (...)
-  {
-    throw std::runtime_error("Don't know the exception! :~(");
-  }
+  const auto status = UA_Client_call(
+    client_instance.get(),
+    parent_id,
+    node_id,
+    inputs.size(),
+    inputs.data(),
+    &noutputs,
+    &outputs);
 
   if (status != UA_STATUSCODE_GOOD)
   {
+    for (auto& input : inputs) UA_Variant_clear(&input);
+    UA_Array_delete(outputs, noutputs, &UA_TYPES[UA_TYPES_VARIANT]);
+
     throw ua::client_error(status);
   }
 
-  ua::variant output_of_callback(outputs, noutputs);
-  response(output_of_callback);
+  ua::variant response_variant(outputs, noutputs);
+  response(response_variant);
 
+  for (auto& input : inputs) UA_Variant_clear(&input);
   UA_Array_delete(outputs, noutputs, &UA_TYPES[UA_TYPES_VARIANT]);
 }
 
@@ -334,8 +265,10 @@ void ua::client::get_method_nargs(
       {
         UA_Variant variant;
         UA_Variant_init(&variant);
-        const UA_StatusCode status = UA_Client_readValueAttribute(client_instance.get(), response_node_id, &variant);
-        const size_t value = variant.arrayLength;
+
+        const auto status = UA_Client_readValueAttribute(client_instance.get(), response_node_id, &variant);
+        const auto value = variant.arrayLength;
+
         UA_Variant_clear(&variant);
 
         if (status != UA_STATUSCODE_GOOD)
@@ -350,8 +283,10 @@ void ua::client::get_method_nargs(
       {
         UA_Variant variant;
         UA_Variant_init(&variant);
-        const UA_StatusCode status = UA_Client_readValueAttribute(client_instance.get(), response_node_id, &variant);
-        const size_t value = variant.arrayLength;
+
+        const auto status = UA_Client_readValueAttribute(client_instance.get(), response_node_id, &variant);
+        const auto value = variant.arrayLength;
+
         UA_Variant_clear(&variant);
 
         if (status != UA_STATUSCODE_GOOD)

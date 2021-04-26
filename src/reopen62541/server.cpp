@@ -85,7 +85,7 @@ void ua::server::run_async()
 {
   if (server_running)
   {
-    throw std::runtime_error("Server is already running!");
+    return;
   }
 
   if (server_runner != nullptr)
@@ -106,32 +106,12 @@ void ua::server::run()
 {
   if (server_running)
   {
-    throw std::runtime_error("Server is already running!");
+    return;
   }
 
   server_running = true;
 
-  UA_StatusCode status = UA_STATUSCODE_GOOD;
-
-  try
-  {
-    if (status == UA_STATUSCODE_GOOD)
-    {
-      status = UA_Server_run(server_instance.get(), &server_running);
-    }
-  }
-  catch (const std::exception& exception)
-  {
-    server_running = false;
-
-    throw exception;
-  }
-  catch (...)
-  {
-    server_running = false;
-
-    throw std::runtime_error("Don't know the exception! :~(");
-  }
+  const auto status = UA_Server_run(server_instance.get(), &server_running);
 
   server_running = false;
 
@@ -165,47 +145,34 @@ void ua::server::add_folder(
   const std::string& description,
   const std::vector<std::string>& path)
 {
-  UA_StatusCode status;
-
-  try
+  auto attributes = UA_ObjectAttributes_default;
   {
-    auto attributes = UA_ObjectAttributes_default;
-    {
-      attributes.displayName = UA_LOCALIZEDTEXT(LC, STRINGS(name));
-      attributes.description = UA_LOCALIZEDTEXT(LC, STRINGS(description));
-    }
-
-    const auto node = UID(path, name);
-    const auto parent = UID(path);
-
-    const auto node_id = UA_NODEID_STRING(NS, STRINGS(node));
-    const auto node_name = UA_QUALIFIEDNAME(NS, STRINGS(name));
-    const auto node_type = UA_NODEID_NUMERIC(NS, UA_NS0ID_FOLDERTYPE);
-
-    const auto parent_id = path.empty()
-      ? UA_NODEID_NUMERIC(NS, UA_NS0ID_OBJECTSFOLDER)
-      : UA_NODEID_STRING(NS, STRINGS(parent));
-    const auto parent_type = UA_NODEID_NUMERIC(NS, UA_NS0ID_ORGANIZES);
-
-    status = UA_Server_addObjectNode(
-      server_instance.get(),
-      node_id,
-      parent_id,
-      parent_type,
-      node_name,
-      node_type,
-      attributes,
-      nullptr,
-      nullptr);
+    attributes.displayName = UA_LOCALIZEDTEXT(LC, STRINGS(name));
+    attributes.description = UA_LOCALIZEDTEXT(LC, STRINGS(description));
   }
-  catch (const std::exception& exception)
-  {
-    throw exception;
-  }
-  catch (...)
-  {
-    throw std::runtime_error("Don't know the exception! :~(");
-  }
+
+  const auto node = UID(path, name);
+  const auto parent = UID(path);
+
+  const auto node_id = UA_NODEID_STRING(NS, STRINGS(node));
+  const auto node_name = UA_QUALIFIEDNAME(NS, STRINGS(name));
+  const auto node_type = UA_NODEID_NUMERIC(NS, UA_NS0ID_FOLDERTYPE);
+
+  const auto parent_id = path.empty()
+    ? UA_NODEID_NUMERIC(NS, UA_NS0ID_OBJECTSFOLDER)
+    : UA_NODEID_STRING(NS, STRINGS(parent));
+  const auto parent_type = UA_NODEID_NUMERIC(NS, UA_NS0ID_ORGANIZES);
+
+  const auto status = UA_Server_addObjectNode(
+    server_instance.get(),
+    node_id,
+    parent_id,
+    parent_type,
+    node_name,
+    node_type,
+    attributes,
+    nullptr,
+    nullptr);
 
   if (status != UA_STATUSCODE_GOOD)
   {
@@ -218,47 +185,34 @@ void ua::server::add_object(
   const std::string& description,
   const std::vector<std::string>& path)
 {
-  UA_StatusCode status;
-
-  try
+  auto attributes = UA_ObjectAttributes_default;
   {
-    auto attributes = UA_ObjectAttributes_default;
-    {
-      attributes.displayName = UA_LOCALIZEDTEXT(LC, STRINGS(name));
-      attributes.description = UA_LOCALIZEDTEXT(LC, STRINGS(description));
-    }
-
-    const auto node = UID(path, name);
-    const auto parent = UID(path);
-
-    const auto node_id = UA_NODEID_STRING(NS, STRINGS(node));
-    const auto node_name = UA_QUALIFIEDNAME(NS, STRINGS(name));
-    const auto node_type = UA_NODEID_NUMERIC(NS, UA_NS0ID_BASEOBJECTTYPE);
-
-    const auto parent_id = path.empty()
-      ? UA_NODEID_NUMERIC(NS, UA_NS0ID_OBJECTSFOLDER)
-      : UA_NODEID_STRING(NS, STRINGS(parent));
-    const auto parent_type = UA_NODEID_NUMERIC(NS, UA_NS0ID_ORGANIZES);
-
-    status = UA_Server_addObjectNode(
-      server_instance.get(),
-      node_id,
-      parent_id,
-      parent_type,
-      node_name,
-      node_type,
-      attributes,
-      nullptr,
-      nullptr);
+    attributes.displayName = UA_LOCALIZEDTEXT(LC, STRINGS(name));
+    attributes.description = UA_LOCALIZEDTEXT(LC, STRINGS(description));
   }
-  catch (const std::exception& exception)
-  {
-    throw exception;
-  }
-  catch (...)
-  {
-    throw std::runtime_error("Don't know the exception! :~(");
-  }
+
+  const auto node = UID(path, name);
+  const auto parent = UID(path);
+
+  const auto node_id = UA_NODEID_STRING(NS, STRINGS(node));
+  const auto node_name = UA_QUALIFIEDNAME(NS, STRINGS(name));
+  const auto node_type = UA_NODEID_NUMERIC(NS, UA_NS0ID_BASEOBJECTTYPE);
+
+  const auto parent_id = path.empty()
+    ? UA_NODEID_NUMERIC(NS, UA_NS0ID_OBJECTSFOLDER)
+    : UA_NODEID_STRING(NS, STRINGS(parent));
+  const auto parent_type = UA_NODEID_NUMERIC(NS, UA_NS0ID_ORGANIZES);
+
+  const auto status = UA_Server_addObjectNode(
+    server_instance.get(),
+    node_id,
+    parent_id,
+    parent_type,
+    node_name,
+    node_type,
+    attributes,
+    nullptr,
+    nullptr);
 
   if (status != UA_STATUSCODE_GOOD)
   {
@@ -274,59 +228,46 @@ void ua::server::add_property(
   const int32_t valuerank,
   UA_DataSource callback)
 {
-  UA_StatusCode status;
-
-  try
+  auto attributes = UA_VariableAttributes_default;
   {
-    auto attributes = UA_VariableAttributes_default;
+    attributes.displayName = UA_LOCALIZEDTEXT(LC, STRINGS(name));
+    attributes.description = UA_LOCALIZEDTEXT(LC, STRINGS(description));
+
+    attributes.dataType = UA_TYPES[datatype].typeId;
+    attributes.valueRank = valuerank;
+
+    if (callback.read != nullptr)
     {
-      attributes.displayName = UA_LOCALIZEDTEXT(LC, STRINGS(name));
-      attributes.description = UA_LOCALIZEDTEXT(LC, STRINGS(description));
-
-      attributes.dataType = UA_TYPES[datatype].typeId;
-      attributes.valueRank = valuerank;
-
-      if (callback.read != nullptr)
-      {
-        attributes.accessLevel |= UA_ACCESSLEVELMASK_READ;
-      }
-
-      if (callback.write != nullptr)
-      {
-        attributes.accessLevel |= UA_ACCESSLEVELMASK_WRITE;
-      }
+      attributes.accessLevel |= UA_ACCESSLEVELMASK_READ;
     }
 
-    const auto node = UID(path, name);
-    const auto parent = UID(path);
-
-    const auto node_id = UA_NODEID_STRING(NS, STRINGS(node));
-    const auto node_name = UA_QUALIFIEDNAME(NS, STRINGS(name));
-    const auto node_type = UA_NODEID_NUMERIC(NS, UA_NS0ID_BASEDATAVARIABLETYPE);
-
-    const auto parent_id = UA_NODEID_STRING(NS, STRINGS(parent));
-    const auto parent_type = UA_NODEID_NUMERIC(NS, UA_NS0ID_HASCOMPONENT);
-
-    status = UA_Server_addDataSourceVariableNode(
-      server_instance.get(),
-      node_id,
-      parent_id,
-      parent_type,
-      node_name,
-      node_type,
-      attributes,
-      callback,
-      nullptr,
-      nullptr);
+    if (callback.write != nullptr)
+    {
+      attributes.accessLevel |= UA_ACCESSLEVELMASK_WRITE;
+    }
   }
-  catch (const std::exception& exception)
-  {
-    throw exception;
-  }
-  catch (...)
-  {
-    throw std::runtime_error("Don't know the exception! :~(");
-  }
+
+  const auto node = UID(path, name);
+  const auto parent = UID(path);
+
+  const auto node_id = UA_NODEID_STRING(NS, STRINGS(node));
+  const auto node_name = UA_QUALIFIEDNAME(NS, STRINGS(name));
+  const auto node_type = UA_NODEID_NUMERIC(NS, UA_NS0ID_BASEDATAVARIABLETYPE);
+
+  const auto parent_id = UA_NODEID_STRING(NS, STRINGS(parent));
+  const auto parent_type = UA_NODEID_NUMERIC(NS, UA_NS0ID_HASCOMPONENT);
+
+  const auto status = UA_Server_addDataSourceVariableNode(
+    server_instance.get(),
+    node_id,
+    parent_id,
+    parent_type,
+    node_name,
+    node_type,
+    attributes,
+    callback,
+    nullptr,
+    nullptr);
 
   if (status != UA_STATUSCODE_GOOD)
   {
@@ -342,59 +283,46 @@ void ua::server::add_method(
   const std::vector<ua::argument>& outputs,
   UA_MethodCallback callback)
 {
-  UA_StatusCode status;
-
-  try
+  auto attributes = UA_MethodAttributes_default;
   {
-    auto attributes = UA_MethodAttributes_default;
-    {
-      attributes.displayName = UA_LOCALIZEDTEXT(LC, STRINGS(name));
-      attributes.description = UA_LOCALIZEDTEXT(LC, STRINGS(description));
+    attributes.displayName = UA_LOCALIZEDTEXT(LC, STRINGS(name));
+    attributes.description = UA_LOCALIZEDTEXT(LC, STRINGS(description));
 
-      attributes.executable = true;
-      attributes.userExecutable = true;
-    }
-
-    std::vector<UA_Argument> inputArguments(inputs.size());
-    for (size_t i = 0; i < inputs.size(); ++i)
-      inputs[i].to_ua_argument(LC, STRINGS, inputArguments[i]);
-
-    std::vector<UA_Argument> outputArguments(outputs.size());
-    for (size_t i = 0; i < outputs.size(); ++i)
-      outputs[i].to_ua_argument(LC, STRINGS, outputArguments[i]);
-
-    const auto node = UID(path, name);
-    const auto parent = UID(path);
-
-    const auto node_id = UA_NODEID_STRING(NS, STRINGS(node));
-    const auto node_name = UA_QUALIFIEDNAME(NS, STRINGS(name));
-
-    const auto parent_id = UA_NODEID_STRING(NS, STRINGS(parent));
-    const auto parent_type = UA_NODEID_NUMERIC(NS, UA_NS0ID_HASCOMPONENT);
-
-    status = UA_Server_addMethodNode(
-      server_instance.get(),
-      node_id,
-      parent_id,
-      parent_type,
-      node_name,
-      attributes,
-      callback,
-      inputArguments.size(),
-      inputArguments.data(),
-      outputArguments.size(),
-      outputArguments.data(),
-      nullptr,
-      nullptr);
+    attributes.executable = true;
+    attributes.userExecutable = true;
   }
-  catch (const std::exception& exception)
-  {
-    throw exception;
-  }
-  catch (...)
-  {
-    throw std::runtime_error("Don't know the exception! :~(");
-  }
+
+  std::vector<UA_Argument> inputArguments(inputs.size());
+  for (size_t i = 0; i < inputs.size(); ++i)
+    inputs[i].to_ua_argument(LC, STRINGS, inputArguments[i]);
+
+  std::vector<UA_Argument> outputArguments(outputs.size());
+  for (size_t i = 0; i < outputs.size(); ++i)
+    outputs[i].to_ua_argument(LC, STRINGS, outputArguments[i]);
+
+  const auto node = UID(path, name);
+  const auto parent = UID(path);
+
+  const auto node_id = UA_NODEID_STRING(NS, STRINGS(node));
+  const auto node_name = UA_QUALIFIEDNAME(NS, STRINGS(name));
+
+  const auto parent_id = UA_NODEID_STRING(NS, STRINGS(parent));
+  const auto parent_type = UA_NODEID_NUMERIC(NS, UA_NS0ID_HASCOMPONENT);
+
+  const auto status = UA_Server_addMethodNode(
+    server_instance.get(),
+    node_id,
+    parent_id,
+    parent_type,
+    node_name,
+    attributes,
+    callback,
+    inputArguments.size(),
+    inputArguments.data(),
+    outputArguments.size(),
+    outputArguments.data(),
+    nullptr,
+    nullptr);
 
   if (status != UA_STATUSCODE_GOOD)
   {

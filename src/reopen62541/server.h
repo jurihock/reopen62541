@@ -93,7 +93,7 @@ namespace ua
       const std::vector<std::string>& path,
       std::function<ua::server_property_getter_callback> getter)
     {
-      const std::string node = ua::convert::to_delimited_string(path, name);
+      const auto node = ua::convert::to_delimited_string(path, name);
 
       property_getter_callbacks[node] = getter;
       property_setter_callbacks[node] = nullptr;
@@ -115,7 +115,7 @@ namespace ua
       std::function<ua::server_property_getter_callback> getter,
       std::function<ua::server_property_setter_callback> setter)
     {
-      const std::string node = UID(path, name);
+      const auto node = UID(path, name);
 
       server_property_getter_callbacks[node] = getter;
       server_property_setter_callbacks[node] = setter;
@@ -145,7 +145,7 @@ namespace ua
       const std::vector<ua::argument>& outputs,
       std::function<ua::server_method_callback> callback)
     {
-      const std::string node = UID(path, name);
+      const auto node = UID(path, name);
 
       server_method_callbacks[node] = callback;
 
@@ -158,7 +158,7 @@ namespace ua
       const std::vector<std::string>& path,
       std::function<void()> callback)
     {
-      const std::string node = UID(path, name);
+      const auto node = UID(path, name);
 
       server_method_callbacks[node] = [callback](const ua::variant&, ua::variant&) { callback(); };
 
