@@ -8,7 +8,7 @@ popd
 set CMAKE_BINARY_DIR=%CMAKE_SOURCE_DIR%\build
 
 if not exist "%CMAKE_BINARY_DIR%" (
-  echo "not found..."
+  mkdir "%CMAKE_BINARY_DIR%"
 )
 
 pushd "%CMAKE_BINARY_DIR%"
