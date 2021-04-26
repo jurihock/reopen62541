@@ -2,10 +2,9 @@
 
 #include <reopen62541/convert.h>
 #include <reopen62541/error.h>
-#include <reopen62541/input.h>
-#include <reopen62541/output.h>
 #include <reopen62541/strings.h>
 #include <reopen62541/uid.h>
+#include <reopen62541/variant.h>
 
 #include <open62541.h>
 
@@ -20,8 +19,8 @@ namespace ua
   typedef void (client_log_callback)(UA_LogLevel level, UA_LogCategory category, const std::string& message);
   typedef std::vector<std::function<ua::client_log_callback>> client_log_callback_vector;
 
-  typedef void (client_method_request_callback)(ua::output& request);
-  typedef void (client_method_response_callback)(const ua::input& response);
+  typedef void (client_method_request_callback)(ua::variant& input);
+  typedef void (client_method_response_callback)(const ua::variant& output);
 
   class client
   {

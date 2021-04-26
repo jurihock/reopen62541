@@ -131,7 +131,7 @@ void ua::client::call(
   std::for_each(inputs.begin(), inputs.end(),
     [](UA_Variant& input) { UA_Variant_init(&input); });
 
-  ua::output input(inputs.data(), inputs.size());
+  ua::variant input(inputs.data(), inputs.size());
   request(input);
 
   UA_Variant* outputs;
@@ -168,7 +168,7 @@ void ua::client::call(
     throw ua::client_error(status);
   }
 
-  ua::input output(outputs, noutputs);
+  ua::variant output(outputs, noutputs);
   response(output);
 
   UA_Array_delete(outputs, noutputs, &UA_TYPES[UA_TYPES_VARIANT]);

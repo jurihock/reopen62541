@@ -1,26 +1,144 @@
 #pragma once
 
+#include <open62541.h>
+
 #include <string>
 #include <vector>
 
-#include <open62541.h>
-
 namespace ua
 {
-  struct output
+  class variant
   {
-    UA_Variant* variant;
-    const size_t size;
+  public:
 
-    output(UA_Variant* variant, size_t size) : variant(variant), size(size) {}
+    variant(UA_Variant* variant, size_t size) :
+      variant_writable(variant),
+      variant_readable(variant),
+      variant_size(size)
+    {
+    }
 
-    output operator[](const size_t index) const { return output(variant + index, 1); }
+    variant(const UA_Variant* variant, size_t size) :
+      variant_writable(nullptr),
+      variant_readable(variant),
+      variant_size(size)
+    {
+    }
+
+    variant(const ua::variant& other) :
+      variant_writable(other.variant_writable),
+      variant_readable(other.variant_readable),
+      variant_size(other.variant_size)
+    {
+    }
+
+    variant operator[](const size_t index) const
+    {
+      if (index >= variant_size)
+      {
+        throw std::invalid_argument("Specified variant index out of bounds!");
+      }
+
+      return variant(variant_writable, variant_readable, variant_size - index, index);
+    }
+
+    UA_Variant* write() const
+    {
+      return variant_writable;
+    }
+
+    const UA_Variant* read() const
+    {
+      return variant_readable;
+    }
+
+    size_t size() const
+    {
+      return variant_size;
+    }
+
+    template<typename T> operator T() const { return get<T>(); }
+    template<typename T> void operator>>(T& value) const { value = get<T>(); }
 
     template<typename T> void operator=(const T& value) { set<T>(value); }
     template<typename T> void operator<<(const T& value) { set<T>(value); }
 
+    template<typename T> T get() const
+    {
+      const UA_Variant* variant = variant_readable;
+
+      if (variant == nullptr)
+      {
+        throw std::runtime_error("Read operation not available in current context!");
+      }
+
+      // SCALARS
+
+      if constexpr (std::is_same<T, bool>::value)
+        return *(static_cast<bool*>(variant->data));
+
+      if constexpr (std::is_same<T, int8_t>::value)
+        return *(static_cast<int8_t*>(variant->data));
+
+      if constexpr (std::is_same<T, uint8_t>::value)
+        return *(static_cast<uint8_t*>(variant->data));
+
+      if constexpr (std::is_same<T, int16_t>::value)
+        return *(static_cast<int16_t*>(variant->data));
+
+      if constexpr (std::is_same<T, uint16_t>::value)
+        return *(static_cast<uint16_t*>(variant->data));
+
+      if constexpr (std::is_same<T, int32_t>::value)
+        return *(static_cast<int32_t*>(variant->data));
+
+      if constexpr (std::is_same<T, uint32_t>::value)
+        return *(static_cast<uint32_t*>(variant->data));
+
+      if constexpr (std::is_same<T, int64_t>::value)
+        return *(static_cast<int64_t*>(variant->data));
+
+      if constexpr (std::is_same<T, uint64_t>::value)
+        return *(static_cast<uint64_t*>(variant->data));
+
+      if constexpr (std::is_same<T, float>::value)
+        return *(static_cast<float*>(variant->data));
+
+      if constexpr (std::is_same<T, double>::value)
+        return *(static_cast<double*>(variant->data));
+
+      if constexpr (std::is_same<T, std::string>::value)
+      {
+        const UA_String* src = static_cast<UA_String*>(variant->data);
+        const std::string dst(reinterpret_cast<char*>(src->data), src->length);
+        return dst;
+      }
+
+      if constexpr (std::is_same<T, std::wstring>::value)
+      {
+        const UA_String* src = static_cast<UA_String*>(variant->data);
+        const std::wstring dst(reinterpret_cast<wchar_t*>(src->data), src->length);
+        return dst;
+      }
+
+      // VECTORS
+
+      // (TODO)
+
+      // ELSE
+
+      throw std::invalid_argument("Invalid data type!");
+    }
+
     template<typename T> void set(const T& value)
     {
+      UA_Variant* variant = variant_writable;
+
+      if (variant == nullptr)
+      {
+        throw std::runtime_error("Write operation not available in current context!");
+      }
+
       // SCALARS
 
       if constexpr (std::is_same<T, bool>::value)
@@ -127,5 +245,18 @@ namespace ua
 
       else throw std::invalid_argument("Invalid data type!");
     }
+
+    private:
+
+      UA_Variant* variant_writable;
+      const UA_Variant* variant_readable;
+      const size_t variant_size;
+
+      variant(UA_Variant* variant_writable, const UA_Variant* variant_readable, size_t size, size_t offset) :
+        variant_writable(variant_writable != nullptr ? variant_writable + offset : nullptr),
+        variant_readable(variant_readable != nullptr ? variant_readable + offset : nullptr),
+        variant_size(size)
+      {
+      }
   };
 }

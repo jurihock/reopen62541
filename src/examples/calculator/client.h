@@ -71,12 +71,12 @@ struct calculator_client : calculator_interface, ua::client
     call(
       "Calculate",
       { "Calculator" },
-      [&](ua::output& request)
+      [&](ua::variant& input)
       {
       },
-      [&](const ua::input& response)
+      [&](const ua::variant& output)
       {
-        result = response.get<double>();
+        result = output;
       });
 
     return result;

@@ -357,11 +357,11 @@ void ua::server::add_method(
 
     std::vector<UA_Argument> inputArguments(inputs.size());
     for (size_t i = 0; i < inputs.size(); ++i)
-      inputs[i].ToUaArgument(LC, STRINGS, inputArguments[i]);
+      inputs[i].to_ua_argument(LC, STRINGS, inputArguments[i]);
 
     std::vector<UA_Argument> outputArguments(outputs.size());
     for (size_t i = 0; i < outputs.size(); ++i)
-      outputs[i].ToUaArgument(LC, STRINGS, outputArguments[i]);
+      outputs[i].to_ua_argument(LC, STRINGS, outputArguments[i]);
 
     const auto node = UID(path, name);
     const auto parent = UID(path);
@@ -450,7 +450,7 @@ UA_StatusCode ua::server::property_getter_callback_handler(
   {
     const auto& callback = context->server_property_getter_callbacks[node];
 
-    ua::output output_of_callback(&value->value, 1);
+    ua::variant output_of_callback(&value->value, 1);
 
     callback(output_of_callback);
 
@@ -503,7 +503,7 @@ UA_StatusCode ua::server::property_setter_callback_handler(
   {
     const auto& callback = context->server_property_setter_callbacks[node];
 
-    ua::input input_of_callback(&value->value, 1);
+    ua::variant input_of_callback(&value->value, 1);
 
     callback(input_of_callback);
 
@@ -555,8 +555,8 @@ UA_StatusCode ua::server::method_callback_handler(
   {
     const auto& callback = context->server_method_callbacks[node];
 
-    ua::input input_of_callback(input, inputSize);
-    ua::output output_of_callback(output, outputSize);
+    ua::variant input_of_callback(input, inputSize);
+    ua::variant output_of_callback(output, outputSize);
 
     callback(input_of_callback, output_of_callback);
 

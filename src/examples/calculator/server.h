@@ -51,11 +51,11 @@ struct calculator_server : calculator_implementation, ua::server
       "Bill",
       "The bill amount",
       { "Calculator" },
-      [&](ua::output& output)
+      [&](ua::variant& output)
       {
         output = bill();
       },
-      [&](const ua::input& input)
+      [&](const ua::variant& input)
       {
         bill(input);
 
@@ -68,11 +68,11 @@ struct calculator_server : calculator_implementation, ua::server
       "Tip",
       "The tip percentage",
       { "Calculator" },
-      [&](ua::output& output)
+      [&](ua::variant& output)
       {
         output = tip();
       },
-      [&](const ua::input& input)
+      [&](const ua::variant& input)
       {
         tip(input);
 
@@ -87,7 +87,7 @@ struct calculator_server : calculator_implementation, ua::server
       { "Calculator" },
       {},
       { ua::argument::scalar<double>("Result", "The tip amount") },
-      [&](const ua::input& input, ua::output& output)
+      [&](const ua::variant& input, ua::variant& output)
       {
         std::cout << "Calculating the bill tip"
                   << std::endl;

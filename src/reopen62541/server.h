@@ -3,10 +3,9 @@
 #include <reopen62541/argument.h>
 #include <reopen62541/convert.h>
 #include <reopen62541/error.h>
-#include <reopen62541/input.h>
-#include <reopen62541/output.h>
 #include <reopen62541/strings.h>
 #include <reopen62541/uid.h>
+#include <reopen62541/variant.h>
 
 #include <open62541.h>
 
@@ -26,13 +25,13 @@ namespace ua
   typedef void (server_log_callback)(UA_LogLevel level, UA_LogCategory category, const std::string& message);
   typedef std::vector<std::function<ua::server_log_callback>> server_log_callback_vector;
 
-  typedef void (server_property_getter_callback)(ua::output& output);
+  typedef void (server_property_getter_callback)(ua::variant& output);
   typedef std::map<std::string, std::function<ua::server_property_getter_callback>> server_property_getter_callback_map;
 
-  typedef void (server_property_setter_callback)(const ua::input& input);
+  typedef void (server_property_setter_callback)(const ua::variant& input);
   typedef std::map<std::string, std::function<ua::server_property_setter_callback>> server_property_setter_callback_map;
 
-  typedef void (server_method_callback)(const ua::input& input, ua::output& output);
+  typedef void (server_method_callback)(const ua::variant& input, ua::variant& output);
   typedef std::map<std::string, std::function<ua::server_method_callback>> server_method_callback_map;
 
   class server
@@ -161,7 +160,7 @@ namespace ua
     {
       const std::string node = UID(path, name);
 
-      server_method_callbacks[node] = [callback](const ua::input&, ua::output&) { callback(); };
+      server_method_callbacks[node] = [callback](const ua::variant&, ua::variant&) { callback(); };
 
       add_method(name, description, path, {}, {}, method_callback_handler);
     };
