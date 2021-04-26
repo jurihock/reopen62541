@@ -378,9 +378,9 @@ UA_StatusCode ua::server::variable_getter_callback_handler(
   {
     const auto& callback = context->server_variable_getter_callbacks[node];
 
-    ua::variant output_of_callback(&value->value, 1);
+    ua::variant callback_variant(&value->value, 1);
 
-    callback(output_of_callback);
+    callback(callback_variant);
 
     value->hasValue = true; // WTF?
 
@@ -431,9 +431,9 @@ UA_StatusCode ua::server::variable_setter_callback_handler(
   {
     const auto& callback = context->server_variable_setter_callbacks[node];
 
-    ua::variant input_of_callback(&value->value, 1);
+    ua::variant callback_variant(&value->value, 1);
 
-    callback(input_of_callback);
+    callback(callback_variant);
 
     return UA_STATUSCODE_GOOD;
   }
@@ -483,10 +483,10 @@ UA_StatusCode ua::server::method_callback_handler(
   {
     const auto& callback = context->server_method_callbacks[node];
 
-    ua::variant input_of_callback(input, inputSize);
-    ua::variant output_of_callback(output, outputSize);
+    ua::variant callback_variant_left(input, inputSize);
+    ua::variant callback_variant_right(output, outputSize);
 
-    callback(input_of_callback, output_of_callback);
+    callback(callback_variant_left, callback_variant_right);
 
     return UA_STATUSCODE_GOOD;
   }
