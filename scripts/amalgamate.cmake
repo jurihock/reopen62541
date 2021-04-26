@@ -23,7 +23,7 @@ foreach(TYPE ${TYPES})
     string(REPLACE "\n" "\n;" LINES "${LINES}")
 
     string(LENGTH "${FILE}.${TYPE}" ORNAMENT)
-    MATH(EXPR ORNAMENT "${ORNAMENT} + 8")
+    math(EXPR ORNAMENT "${ORNAMENT} + 8")
     string(REPEAT "/" ${ORNAMENT} ORNAMENT)
 
     list(APPEND BODY "${ORNAMENT}\n")
