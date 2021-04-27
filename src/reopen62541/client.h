@@ -8,8 +8,8 @@
 
 #include <open62541.h>
 
-#include <algorithm>
 #include <cstdarg>
+#include <functional>
 #include <memory>
 #include <string>
 #include <vector>

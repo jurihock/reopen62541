@@ -9,16 +9,17 @@
 
 #include <open62541.h>
 
-#include <algorithm>
 #include <cstdarg>
-#include <cstdio>
 #include <functional>
-#include <iostream>
 #include <map>
 #include <memory>
 #include <string>
-#include <thread>
 #include <vector>
+
+#ifdef __cplusplus_cli
+#else
+#include <thread>
+#endif
 
 namespace ua
 {
@@ -51,7 +52,11 @@ namespace ua
 
     bool running() const;
 
+    #ifdef __cplusplus_cli
+    #else
     void run_async();
+    #endif
+
     void run();
     void shutdown();
 
@@ -186,7 +191,11 @@ namespace ua
     const std::string server_uri;
 
     volatile UA_Boolean server_running;
+
+    #ifdef __cplusplus_cli
+    #else
     std::shared_ptr<std::thread> server_runner;
+    #endif
 
     ua::server_log_callback_vector server_log_callbacks;
     ua::server_variable_getter_callback_map server_variable_getter_callbacks;

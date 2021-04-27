@@ -81,6 +81,8 @@ bool ua::server::running() const
   return server_running;
 }
 
+#ifdef __cplusplus_cli
+#else
 void ua::server::run_async()
 {
   if (server_running)
@@ -101,6 +103,7 @@ void ua::server::run_async()
     run();
   }));
 }
+#endif
 
 void ua::server::run()
 {
