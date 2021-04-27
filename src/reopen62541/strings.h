@@ -2,7 +2,6 @@
 
 #include <cassert>
 #include <map>
-#include <mutex>
 #include <string>
 #include <vector>
 
@@ -18,8 +17,6 @@ namespace ua
       {
         return empty;
       }
-
-      std::lock_guard<std::mutex> lock(mutex);
 
       const auto existing = map.find(value);
 
@@ -47,7 +44,6 @@ namespace ua
     static inline char empty[] = "";
 
     std::map<std::string, std::vector<char>> map;
-    std::mutex mutex;
 
   };
 }
