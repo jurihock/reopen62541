@@ -28,8 +28,8 @@ foreach(TYPE ${TYPES})
     string(REPLACE "\n" "\n;" LINES "${LINES}")
 
     set(LABEL "/// reopen62541/${FILE}.${TYPE} ///")
-    string(LENGTH "${LABEL}" ORNAMENT)
-    string(REPEAT "/" ${ORNAMENT} ORNAMENT)
+    string(LENGTH "${LABEL}" N)
+    string(REPEAT "/" ${N} ORNAMENT)
 
     list(APPEND BODY "\n\n")
     list(APPEND BODY "${ORNAMENT}\n")
