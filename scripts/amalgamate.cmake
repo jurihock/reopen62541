@@ -1,3 +1,7 @@
+# scans SRC directory for .h and .cpp files,
+# extracts include directives and source code,
+# writes concatenated results to DST directory
+
 set(SRC "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/reopen62541")
 set(DST "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}")
 
@@ -15,20 +19,23 @@ foreach(TYPE ${TYPES})
       continue()
     endif()
 
-    message("Amalgamate ${SRC}/${FILE}.${TYPE}")
+    message("-- Amalgamating: ${SRC}/${FILE}.${TYPE}")
 
     file(READ "${SRC}/${FILE}.${TYPE}" LINES)
 
+    string(STRIP "${LINES}" LINES)
     string(REPLACE ";" "\;" LINES "${LINES}")
     string(REPLACE "\n" "\n;" LINES "${LINES}")
 
-    string(LENGTH "${FILE}.${TYPE}" ORNAMENT)
-    math(EXPR ORNAMENT "${ORNAMENT} + 8")
+    set(LABEL "/// reopen62541/${FILE}.${TYPE} ///")
+    string(LENGTH "${LABEL}" ORNAMENT)
     string(REPEAT "/" ${ORNAMENT} ORNAMENT)
 
+    list(APPEND BODY "\n\n")
     list(APPEND BODY "${ORNAMENT}\n")
-    list(APPEND BODY "/// ${FILE}.${TYPE} ///\n")
-    list(APPEND BODY "${ORNAMENT}\n\n")
+    list(APPEND BODY "${LABEL}\n")
+    list(APPEND BODY "${ORNAMENT}\n")
+    list(APPEND BODY "\n")
 
     set(SKIP_EMPTY_LINES 1)
 
@@ -40,11 +47,7 @@ foreach(TYPE ${TYPES})
         continue()
       endif()
 
-      if("${LINE}" MATCHES "^namespace")
-        set(SKIP_EMPTY_LINES 0)
-      endif()
-
-      if("${LINE}" MATCHES "^ua::")
+      if("${LINE}" MATCHES "^(namespace ua|ua::)")
         set(SKIP_EMPTY_LINES 0)
       endif()
 
@@ -52,11 +55,7 @@ foreach(TYPE ${TYPES})
         continue()
       endif()
 
-      if("${LINE}" MATCHES "^#include <open62541")
-        continue()
-      endif()
-
-      if("${LINE}" MATCHES "^#include <reopen62541")
+      if("${LINE}" MATCHES "^#include <(open|reopen)62541")
         continue()
       endif()
 
@@ -67,8 +66,6 @@ foreach(TYPE ${TYPES})
       endif()
 
     endforeach()
-
-    list(APPEND BODY "\n")
 
   endforeach()
 
