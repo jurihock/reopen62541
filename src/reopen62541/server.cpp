@@ -51,6 +51,10 @@ ua::server::server(const int portnumber, const std::string& hostname, const std:
   }
 }
 
+ua::server::server() : ua::server::server(4840, "localhost", "open62541", "urn:open62541")
+{
+}
+
 ua::server::~server()
 {
   shutdown();

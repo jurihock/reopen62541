@@ -27,6 +27,10 @@ ua::client::client(const int portnumber, const std::string& hostname, const int 
   client_config->timeout = timeout;
 }
 
+ua::client::client() : ua::client::client(4840, "localhost")
+{
+}
+
 ua::client::~client()
 {
   disconnect();
