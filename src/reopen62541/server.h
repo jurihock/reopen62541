@@ -16,8 +16,7 @@
 #include <string>
 #include <vector>
 
-#ifdef __cplusplus_cli
-#else
+#ifndef __cplusplus_cli
 #include <thread>
 #endif
 
@@ -53,8 +52,7 @@ namespace ua
 
     bool running() const;
 
-    #ifdef __cplusplus_cli
-    #else
+    #ifndef __cplusplus_cli
     void run_async();
     #endif
 
@@ -193,8 +191,7 @@ namespace ua
 
     volatile UA_Boolean server_running;
 
-    #ifdef __cplusplus_cli
-    #else
+    #ifndef __cplusplus_cli
     std::shared_ptr<std::thread> server_runner;
     #endif
 

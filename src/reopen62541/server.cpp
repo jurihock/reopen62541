@@ -85,8 +85,7 @@ bool ua::server::running() const
   return server_running;
 }
 
-#ifdef __cplusplus_cli
-#else
+#ifndef __cplusplus_cli
 void ua::server::run_async()
 {
   if (server_running)
