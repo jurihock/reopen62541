@@ -100,7 +100,7 @@ namespace ua
       const std::vector<std::string>& path,
       std::function<ua::server_variable_getter_callback> getter)
     {
-      const auto node = ua::convert::to_delimited_string(path, name);
+      const auto node = UID(path, name);
 
       server_variable_getter_callbacks[node] = getter;
       server_variable_setter_callbacks[node] = nullptr;
