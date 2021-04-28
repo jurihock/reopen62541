@@ -193,6 +193,8 @@ namespace ua
 
     #ifndef __cplusplus_cli
     std::shared_ptr<std::thread> server_runner;
+    #else
+    std::shared_ptr<void> server_runner;
     #endif
 
     ua::server_log_callback_vector server_log_callbacks;
