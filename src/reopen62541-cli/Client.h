@@ -12,15 +12,15 @@ using namespace System;
 
 namespace UA
 {
-  delegate void ManagedClientVariableGetterCallback(const ua::variant& output);
-  delegate void ManagedClientVariableSetterCallback(ua::variant& input);
-  delegate void ManagedClientMethodRequestCallback(ua::variant& input);
-  delegate void ManagedClientMethodResponseCallback(const ua::variant& output);
-
   typedef void (*NativeClientVariableGetterCallback)(const ua::variant& output);
   typedef void (*NativeClientVariableSetterCallback)(ua::variant& input);
   typedef void (*NativeClientMethodRequestCallback)(ua::variant& input);
   typedef void (*NativeClientMethodResponseCallback)(const ua::variant& output);
+
+  delegate void ManagedClientVariableGetterCallback(const ua::variant& output);
+  delegate void ManagedClientVariableSetterCallback(ua::variant& input);
+  delegate void ManagedClientMethodRequestCallback(ua::variant& input);
+  delegate void ManagedClientMethodResponseCallback(const ua::variant& output);
 
   public ref class Client : public IDisposable
   {
@@ -63,6 +63,10 @@ namespace UA
       array<String^>^ path,
       Action<UA::Variant^>^ request,
       Action<UA::Variant^>^ response);
+
+  protected:
+
+    virtual void OnLogChanged(UA::LogLevel level, UA::LogCategory category, String^ message) {}
 
   private:
 

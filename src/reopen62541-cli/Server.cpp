@@ -227,5 +227,12 @@ void UA::Server::AddMethod(
 
 void UA::Server::LogCallback(UA::LogLevel level, UA::LogCategory category, String^ message)
 {
-  LogChanged(this, gcnew LogEventArgs(level, category, message));
+  try
+  {
+    OnLogChanged(level, category, message);
+  }
+  finally
+  {
+    LogChanged(this, gcnew LogEventArgs(level, category, message));
+  }
 }

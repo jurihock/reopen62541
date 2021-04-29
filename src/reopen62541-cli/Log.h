@@ -10,6 +10,9 @@ using namespace System;
 
 namespace UA
 {
+  typedef void (*NativeLogCallback)(UA_LogLevel level, UA_LogCategory category, const std::string& message);
+  delegate void ManagedLogCallback(UA_LogLevel level, UA_LogCategory category, const std::string& message);
+
   public enum class LogLevel
   {
     Trace = UA_LOGLEVEL_TRACE,
@@ -63,7 +66,4 @@ namespace UA
     UA::LogCategory category;
     String^ message;
   };
-
-  delegate void ManagedLogCallback(UA_LogLevel level, UA_LogCategory category, const std::string& message);
-  typedef void (*NativeLogCallback)(UA_LogLevel level, UA_LogCategory category, const std::string& message);
 }

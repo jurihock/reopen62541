@@ -13,13 +13,13 @@ using namespace System;
 
 namespace UA
 {
-  delegate void ManagedServerVariableGetterCallback(ua::variant& output);
-  delegate void ManagedServerVariableSetterCallback(const ua::variant& input);
-  delegate void ManagedServerMethodCallback(const ua::variant& input, ua::variant& output);
-
   typedef void (*NativeServerVariableGetterCallback)(ua::variant& output);
   typedef void (*NativeServerVariableSetterCallback)(const ua::variant& input);
   typedef void (*NativeServerMethodCallback)(const ua::variant& input, ua::variant& output);
+
+  delegate void ManagedServerVariableGetterCallback(ua::variant& output);
+  delegate void ManagedServerVariableSetterCallback(const ua::variant& input);
+  delegate void ManagedServerMethodCallback(const ua::variant& input, ua::variant& output);
 
   public ref class Server : public IDisposable
   {
@@ -68,6 +68,10 @@ namespace UA
       array<UA::Argument^>^ inputs,
       array<UA::Argument^>^ outputs,
       Action<UA::Variant^, UA::Variant^>^ action);
+
+  protected:
+
+    virtual void OnLogChanged(UA::LogLevel level, UA::LogCategory category, String^ message) {}
 
   private:
 
