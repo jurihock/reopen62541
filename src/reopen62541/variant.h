@@ -14,32 +14,25 @@ namespace ua
     variant(UA_Variant* variant, size_t size) :
       variant_writable(variant),
       variant_readable(variant),
-      variant_size(size)
+      variant_size(size),
+      variant_index(0)
     {
     }
 
     variant(const UA_Variant* variant, size_t size) :
       variant_writable(nullptr),
       variant_readable(variant),
-      variant_size(size)
+      variant_size(size),
+      variant_index(0)
     {
     }
 
     variant(const ua::variant& other) :
       variant_writable(other.variant_writable),
       variant_readable(other.variant_readable),
-      variant_size(other.variant_size)
+      variant_size(other.variant_size),
+      variant_index(other.variant_index)
     {
-    }
-
-    variant operator[](const size_t index) const
-    {
-      if (index >= variant_size)
-      {
-        throw std::invalid_argument("Specified variant index out of bounds!");
-      }
-
-      return variant(variant_writable, variant_readable, variant_size - index, index);
     }
 
     UA_Variant* write() const
@@ -57,20 +50,27 @@ namespace ua
       return variant_size;
     }
 
-    template<typename T> operator T() const { return get<T>(); }
-    template<typename T> void operator>>(T& value) const { value = get<T>(); }
+    size_t index() const
+    {
+      return variant_index;
+    }
 
+    variant operator[](const size_t index) const
+    {
+      return variant(variant_writable, variant_readable, variant_size, index);
+    }
+
+    template<typename T> operator T() const { return get<T>(); }
     template<typename T> void operator=(const T& value) { set<T>(value); }
-    template<typename T> void operator<<(const T& value) { set<T>(value); }
 
     template<typename T> T get() const
     {
-      const UA_Variant* variant = variant_readable;
-
-      if (variant == nullptr)
+      if (variant_readable == nullptr)
       {
         throw std::runtime_error("Read operation not available in current context!");
       }
+
+      const UA_Variant* variant = variant_readable + variant_index;
 
       // SCALARS
 
@@ -132,12 +132,12 @@ namespace ua
 
     template<typename T> void set(const T& value)
     {
-      UA_Variant* variant = variant_writable;
-
-      if (variant == nullptr)
+      if (variant_writable == nullptr)
       {
         throw std::runtime_error("Write operation not available in current context!");
       }
+
+      UA_Variant* variant = variant_writable + variant_index;
 
       // SCALARS
 
@@ -251,12 +251,18 @@ namespace ua
       UA_Variant* variant_writable;
       const UA_Variant* variant_readable;
       const size_t variant_size;
+      const size_t variant_index;
 
-      variant(UA_Variant* variant_writable, const UA_Variant* variant_readable, size_t size, size_t offset) :
-        variant_writable(variant_writable != nullptr ? variant_writable + offset : nullptr),
-        variant_readable(variant_readable != nullptr ? variant_readable + offset : nullptr),
-        variant_size(size)
+      variant(UA_Variant* variant_writable, const UA_Variant* variant_readable, size_t size, size_t index) :
+        variant_writable(variant_writable != nullptr ? variant_writable : nullptr),
+        variant_readable(variant_readable != nullptr ? variant_readable : nullptr),
+        variant_size(size),
+        variant_index(index)
       {
+        if (index >= size)
+        {
+          throw std::invalid_argument("Specified variant index is out of bounds!");
+        }
       }
   };
 }
