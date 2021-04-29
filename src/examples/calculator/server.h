@@ -9,7 +9,7 @@
 #include <map>
 #include <string>
 
-struct calculator_server : calculator_implementation, ua::server
+struct calculator_server : ua::server, calculator_implementation
 {
   calculator_server() : calculator_implementation(), ua::server(4840, "localhost", "The Bill Tip Calculator", "urn:calculator")
   {

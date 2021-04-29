@@ -78,20 +78,16 @@ namespace ua
       const std::vector<std::string>& path,
       const uint32_t datatype,
       const int32_t valuerank,
-      UA_DataSource callback);
+      std::function<ua::server_variable_getter_callback> getter);
 
-    template<typename T>
     void add_variable(
       const std::string& name,
       const std::string& description,
       const std::vector<std::string>& path,
-      UA_DataSource callback)
-    {
-      const uint32_t datatype = ua::convert::to_ua_data_type<T>();
-      const int32_t valuerank = ua::convert::to_ua_value_rank<T>();
-      
-      add_variable(name, description, path, datatype, valuerank, callback);
-    }
+      const uint32_t datatype,
+      const int32_t valuerank,
+      std::function<ua::server_variable_getter_callback> getter,
+      std::function<ua::server_variable_setter_callback> setter);
 
     template<typename T>
     void add_variable(
@@ -100,18 +96,10 @@ namespace ua
       const std::vector<std::string>& path,
       std::function<ua::server_variable_getter_callback> getter)
     {
-      const auto node = UID(path, name);
+      const uint32_t datatype = ua::convert::to_ua_data_type<T>();
+      const int32_t valuerank = ua::convert::to_ua_value_rank<T>();
 
-      server_variable_getter_callbacks[node] = getter;
-      server_variable_setter_callbacks[node] = nullptr;
-
-      UA_DataSource callback;
-      {
-        callback.read = variable_getter_callback_handler;
-        callback.write = nullptr;
-      }
-
-      add_variable<T>(name, description, path, callback);
+      add_variable(name, description, path, datatype, valuerank, getter);
     };
 
     template<typename T>
@@ -122,18 +110,10 @@ namespace ua
       std::function<ua::server_variable_getter_callback> getter,
       std::function<ua::server_variable_setter_callback> setter)
     {
-      const auto node = UID(path, name);
+      const uint32_t datatype = ua::convert::to_ua_data_type<T>();
+      const int32_t valuerank = ua::convert::to_ua_value_rank<T>();
 
-      server_variable_getter_callbacks[node] = getter;
-      server_variable_setter_callbacks[node] = setter;
-
-      UA_DataSource callback;
-      {
-        callback.read = variable_getter_callback_handler;
-        callback.write = variable_setter_callback_handler;
-      }
-
-      add_variable<T>(name, description, path, callback);
+      add_variable(name, description, path, datatype, valuerank, getter, setter);
     };
 
     void add_method(
@@ -142,35 +122,13 @@ namespace ua
       const std::vector<std::string>& path,
       const std::vector<ua::argument>& inputs,
       const std::vector<ua::argument>& outputs,
-      UA_MethodCallback callback);
+      std::function<ua::server_method_callback> callback);
 
     void add_method(
       const std::string& name,
       const std::string& description,
       const std::vector<std::string>& path,
-      const std::vector<ua::argument>& inputs,
-      const std::vector<ua::argument>& outputs,
-      std::function<ua::server_method_callback> callback)
-    {
-      const auto node = UID(path, name);
-
-      server_method_callbacks[node] = callback;
-
-      add_method(name, description, path, inputs, outputs, method_callback_handler);
-    };
-
-    void add_method(
-      const std::string& name,
-      const std::string& description,
-      const std::vector<std::string>& path,
-      std::function<void()> callback)
-    {
-      const auto node = UID(path, name);
-
-      server_method_callbacks[node] = [callback](const ua::variant&, ua::variant&) { callback(); };
-
-      add_method(name, description, path, {}, {}, method_callback_handler);
-    };
+      std::function<void()> callback);
 
   protected:
 
@@ -201,6 +159,22 @@ namespace ua
     ua::server_variable_getter_callback_map server_variable_getter_callbacks;
     ua::server_variable_setter_callback_map server_variable_setter_callbacks;
     ua::server_method_callback_map server_method_callbacks;
+
+    void add_variable(
+      const std::string& name,
+      const std::string& description,
+      const std::vector<std::string>& path,
+      const uint32_t datatype,
+      const int32_t valuerank,
+      UA_DataSource callback);
+
+    void add_method(
+      const std::string& name,
+      const std::string& description,
+      const std::vector<std::string>& path,
+      const std::vector<ua::argument>& inputs,
+      const std::vector<ua::argument>& outputs,
+      UA_MethodCallback callback);
 
     static void log_callback_handler(
       void* context,

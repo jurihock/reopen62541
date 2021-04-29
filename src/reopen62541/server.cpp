@@ -281,6 +281,51 @@ void ua::server::add_variable(
   }
 }
 
+void ua::server::add_variable(
+  const std::string& name,
+  const std::string& description,
+  const std::vector<std::string>& path,
+  const uint32_t datatype,
+  const int32_t valuerank,
+  std::function<ua::server_variable_getter_callback> getter)
+{
+  const auto node = UID(path, name);
+
+  server_variable_getter_callbacks[node] = getter;
+  server_variable_setter_callbacks[node] = nullptr;
+
+  UA_DataSource callback;
+  {
+    callback.read = variable_getter_callback_handler;
+    callback.write = nullptr;
+  }
+
+  add_variable(name, description, path, datatype, valuerank, callback);
+}
+
+void ua::server::add_variable(
+  const std::string& name,
+  const std::string& description,
+  const std::vector<std::string>& path,
+  const uint32_t datatype,
+  const int32_t valuerank,
+  std::function<ua::server_variable_getter_callback> getter,
+  std::function<ua::server_variable_setter_callback> setter)
+{
+  const auto node = UID(path, name);
+
+  server_variable_getter_callbacks[node] = getter;
+  server_variable_setter_callbacks[node] = setter;
+
+  UA_DataSource callback;
+  {
+    callback.read = variable_getter_callback_handler;
+    callback.write = variable_setter_callback_handler;
+  }
+
+  add_variable(name, description, path, datatype, valuerank, callback);
+}
+
 void ua::server::add_method(
   const std::string& name,
   const std::string& description,
@@ -334,6 +379,34 @@ void ua::server::add_method(
   {
     throw ua::server_error(status);
   }
+}
+
+void ua::server::add_method(
+  const std::string& name,
+  const std::string& description,
+  const std::vector<std::string>& path,
+  const std::vector<ua::argument>& inputs,
+  const std::vector<ua::argument>& outputs,
+  std::function<ua::server_method_callback> callback)
+{
+  const auto node = UID(path, name);
+
+  server_method_callbacks[node] = callback;
+
+  add_method(name, description, path, inputs, outputs, method_callback_handler);
+}
+
+void ua::server::add_method(
+  const std::string& name,
+  const std::string& description,
+  const std::vector<std::string>& path,
+  std::function<void()> callback)
+{
+  const auto node = UID(path, name);
+
+  server_method_callbacks[node] = [callback](const ua::variant&, ua::variant&) { callback(); };
+
+  add_method(name, description, path, {}, {}, method_callback_handler);
 }
 
 void ua::server::log_callback_handler(
