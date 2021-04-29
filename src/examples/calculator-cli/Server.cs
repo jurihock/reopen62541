@@ -9,9 +9,11 @@ static class Program
     server.LogChanged += (sender, args) => Console.WriteLine(
       $"SERVER [{args.Level} {args.Category}] {args.Message}");
 
-    // TODO
+    server.RunAsync();
 
-    server.Run();
+    Console.ReadKey(intercept: true);
+
+    server.Shutdown();
   }
 }
 

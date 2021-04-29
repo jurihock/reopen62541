@@ -10,6 +10,7 @@
 #using <System.dll>
 
 using namespace System;
+using namespace System::Threading;
 
 namespace UA
 {
@@ -25,6 +26,11 @@ namespace UA
   {
   public:
 
+    property bool IsRunning
+    {
+      bool get() { return server != nullptr && server->running(); }
+    }
+
     event EventHandler<LogEventArgs^>^ LogChanged;
 
     Server(int portnumber, String^ hostname, String^ name, String^ uri);
@@ -33,6 +39,7 @@ namespace UA
     !Server();
 
     void Run();
+    void RunAsync();
     void Shutdown();
 
     void AddFolder(
@@ -78,6 +85,8 @@ namespace UA
     bool disposed;
 
     ua::server* server;
+
+    Thread^ thread;
 
     void LogCallback(UA::LogLevel level, UA::LogCategory category, String^ message);
   };

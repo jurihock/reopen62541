@@ -53,6 +53,13 @@ UA::Server::!Server()
     delete server;
     server = nullptr;
   }
+
+  if (thread != nullptr)
+  {
+    if (!thread->Join(1000))
+      thread->Abort();
+    thread = nullptr;
+  }
 }
 
 void UA::Server::Run()
@@ -65,6 +72,23 @@ void UA::Server::Run()
   server->run();
 }
 
+void UA::Server::RunAsync()
+{
+  if (disposed || server == nullptr)
+  {
+    throw gcnew ObjectDisposedException(nameof(Server));
+  }
+
+  if (thread != nullptr || server->running())
+  {
+    return;
+  }
+
+  auto run = gcnew ThreadStart(this, &UA::Server::Run);
+
+  (thread = gcnew Thread(run))->Start();
+}
+
 void UA::Server::Shutdown()
 {
   if (disposed || server == nullptr)
@@ -73,6 +97,13 @@ void UA::Server::Shutdown()
   }
 
   server->shutdown();
+
+  if (thread != nullptr)
+  {
+    if (!thread->Join(1000))
+      thread->Abort();
+    thread = nullptr;
+  }
 }
 
 void UA::Server::AddFolder(

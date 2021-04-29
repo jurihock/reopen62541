@@ -26,6 +26,11 @@ namespace UA
   {
   public:
 
+    property bool IsConnected
+    {
+      bool get() { return client != nullptr && client->connected(); }
+    }
+
     event EventHandler<LogEventArgs^>^ LogChanged;
 
     Client(int portnumber, String^ hostname);
