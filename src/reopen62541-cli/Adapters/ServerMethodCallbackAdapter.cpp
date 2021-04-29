@@ -3,7 +3,8 @@
 UA::ServerMethodCallbackAdapter::ServerMethodCallbackAdapter(Action<UA::Variant^, UA::Variant^>^ action) :
   managed_action(action)
 {
-  managed_action_callback = gcnew UA::ManagedServerMethodCallback(this, &UA::ServerMethodCallbackAdapter::ActionCallback);
+  managed_action_callback = gcnew UA::ManagedServerMethodCallback(
+    this, &UA::ServerMethodCallbackAdapter::ActionCallback);
   native_action = GCHandle::Alloc(managed_action_callback);
   native_action_callback = static_cast<UA::NativeServerMethodCallback>(
     Marshal::GetFunctionPointerForDelegate(managed_action_callback).ToPointer());

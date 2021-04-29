@@ -6,7 +6,8 @@ UA::ServerVariableCallbackAdapter::ServerVariableCallbackAdapter(Action<UA::Vari
 {
   if (managed_getter != nullptr)
   {
-    managed_getter_callback = gcnew UA::ManagedServerVariableGetterCallback(this, &UA::ServerVariableCallbackAdapter::GetterCallback);
+    managed_getter_callback = gcnew UA::ManagedServerVariableGetterCallback(
+      this, &UA::ServerVariableCallbackAdapter::GetterCallback);
     native_getter = GCHandle::Alloc(managed_getter_callback);
     native_getter_callback = static_cast<UA::NativeServerVariableGetterCallback>(
       Marshal::GetFunctionPointerForDelegate(managed_getter_callback).ToPointer());
@@ -19,7 +20,8 @@ UA::ServerVariableCallbackAdapter::ServerVariableCallbackAdapter(Action<UA::Vari
 
   if (managed_setter != nullptr)
   {
-    managed_setter_callback = gcnew UA::ManagedServerVariableSetterCallback(this, &UA::ServerVariableCallbackAdapter::SetterCallback);
+    managed_setter_callback = gcnew UA::ManagedServerVariableSetterCallback(
+      this, &UA::ServerVariableCallbackAdapter::SetterCallback);
     native_setter = GCHandle::Alloc(managed_setter_callback);
     native_setter_callback = static_cast<UA::NativeServerVariableSetterCallback>(
       Marshal::GetFunctionPointerForDelegate(managed_setter_callback).ToPointer());

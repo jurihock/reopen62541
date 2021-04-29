@@ -86,7 +86,7 @@ struct calculator_client : calculator_interface, ua::client
 
   double calculate() override
   {
-    double result;
+    double result = 0;
 
     call("Calculate", { "Calculator" },
       [&](ua::variant& input)
