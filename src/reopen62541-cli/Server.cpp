@@ -87,6 +87,8 @@ void UA::Server::RunAsync()
   auto run = gcnew ThreadStart(this, &UA::Server::Run);
 
   (thread = gcnew Thread(run))->Start();
+
+  Thread::Sleep(1);
 }
 
 void UA::Server::Shutdown()

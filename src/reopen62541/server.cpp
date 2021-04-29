@@ -101,10 +101,11 @@ void ua::server::run_async()
     server_runner = nullptr;
   }
 
-  server_runner = std::shared_ptr<std::thread>(new std::thread([this]()
-  {
-    run();
-  }));
+  server_runner = std::shared_ptr<std::thread>(
+    new std::thread([this]() { run(); }));
+
+  std::this_thread::sleep_for(
+    std::chrono::milliseconds(1));
 }
 #endif
 

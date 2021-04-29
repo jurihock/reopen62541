@@ -9,6 +9,7 @@
 
 #include <open62541.h>
 
+#include <chrono>
 #include <cstdarg>
 #include <functional>
 #include <map>
