@@ -82,7 +82,7 @@ void ua::client::disconnect()
 
   const auto status = UA_Client_disconnect(client_instance.get());
 
-  client_connected = true;
+  client_connected = false;
 
   if (status != UA_STATUSCODE_GOOD)
   {
