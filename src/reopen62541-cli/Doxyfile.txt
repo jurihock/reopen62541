@@ -1,9 +1,9 @@
-PROJECT_NAME           = "reopen62541"
+PROJECT_NAME           = "reopen62541-cli"
 PROJECT_BRIEF          = "C++ and C++/CLI extension for the open62541.org implementation of OPC UA"
 USE_MDFILE_AS_MAINPAGE = README.md
 INPUT                  = ..\..\README.md .
 OUTPUT_DIRECTORY       = ..\..\docs
-HTML_OUTPUT            = reopen62541
+HTML_OUTPUT            = reopen62541-cli
 GENERATE_HTML          = YES
 GENERATE_LATEX         = NO
 FILE_PATTERNS          = *.h *.cpp
