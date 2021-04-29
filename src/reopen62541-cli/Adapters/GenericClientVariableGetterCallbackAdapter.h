@@ -39,7 +39,6 @@ namespace UA
     GCHandle native_getter;
 
     UA::ManagedClientVariableGetterCallback^ managed_getter_callback;
-
     UA::NativeClientVariableGetterCallback native_getter_callback;
 
     void GetterCallback(const ua::variant& output);

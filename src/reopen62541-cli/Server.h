@@ -2,6 +2,7 @@
 
 #include <reopen62541-cli/Argument.h>
 #include <reopen62541-cli/Convert.h>
+#include <reopen62541-cli/Log.h>
 #include <reopen62541-cli/Variant.h>
 
 #include <reopen62541/server.h>
@@ -23,6 +24,8 @@ namespace UA
   public ref class Server : public IDisposable
   {
   public:
+
+    event EventHandler<LogEventArgs^>^ LogChanged;
 
     Server(int portnumber, String^ hostname, String^ name, String^ uri);
     Server();
@@ -71,5 +74,7 @@ namespace UA
     bool disposed;
 
     ua::server* server;
+
+    void LogCallback(UA::LogLevel level, UA::LogCategory category, String^ message);
   };
 }

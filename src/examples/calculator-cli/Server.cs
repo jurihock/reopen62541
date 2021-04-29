@@ -6,6 +6,9 @@ static class Program
   {
     var server = new CalculatorServer();
 
+    server.LogChanged += (sender, args) => Console.WriteLine(
+      $"SERVER [{args.Level} {args.Category}] {args.Message}");
+
     // TODO
 
     server.Run();

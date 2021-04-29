@@ -9,6 +9,9 @@ static class Program
 
     var client = new CalculatorClient();
 
+    client.LogChanged += (sender, args) => Console.WriteLine(
+      $"CLIENT [{args.Level} {args.Category}] {args.Message}");
+
     client.Connect();
 
     client.Bill = 100;

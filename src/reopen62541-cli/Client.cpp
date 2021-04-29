@@ -1,5 +1,6 @@
 #include <reopen62541-cli/Client.h>
 
+#include <reopen62541-cli/Adapters/LogCallbackAdapter.h>
 #include <reopen62541-cli/Adapters/GenericClientVariableGetterCallbackAdapter.h>
 #include <reopen62541-cli/Adapters/GenericClientVariableSetterCallbackAdapter.h>
 #include <reopen62541-cli/Adapters/ClientVariableGetterCallbackAdapter.h>
@@ -16,7 +17,9 @@ UA::Client::Client(int portnumber, String^ hostname) :
     portnumber,
     hostname_std);
 
-  //server->add_log_callback()
+  auto client_log_callback = gcnew Action<UA::LogLevel, UA::LogCategory, String^>(this, &UA::Client::LogCallback);
+  auto client_log_adapter = gcnew UA::LogCallbackAdapter(client_log_callback);
+  client->add_log_callback(client_log_adapter->NativeLogCallback);
 }
 
 UA::Client::Client(int portnumber, String^ hostname, int timeout) :
@@ -30,7 +33,9 @@ UA::Client::Client(int portnumber, String^ hostname, int timeout) :
     hostname_std,
     timeout);
 
-  //server->add_log_callback()
+  auto client_log_callback = gcnew Action<UA::LogLevel, UA::LogCategory, String^>(this, &UA::Client::LogCallback);
+  auto client_log_adapter = gcnew UA::LogCallbackAdapter(client_log_callback);
+  client->add_log_callback(client_log_adapter->NativeLogCallback);
 }
 
 UA::Client::Client() :
@@ -38,7 +43,9 @@ UA::Client::Client() :
 {
   client = new ua::client();
 
-  //server->add_log_callback()
+  auto client_log_callback = gcnew Action<UA::LogLevel, UA::LogCategory, String^>(this, &UA::Client::LogCallback);
+  auto client_log_adapter = gcnew UA::LogCallbackAdapter(client_log_callback);
+  client->add_log_callback(client_log_adapter->NativeLogCallback);
 }
 
 UA::Client::~Client()
@@ -189,4 +196,9 @@ void UA::Client::Call(
     path_std,
     adapter->NativeRequestCallback,
     adapter->NativeResponseCallback);
+}
+
+void UA::Client::LogCallback(UA::LogLevel level, UA::LogCategory category, String^ message)
+{
+  LogChanged(this, gcnew LogEventArgs(level, category, message));
 }

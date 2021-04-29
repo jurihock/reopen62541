@@ -39,7 +39,6 @@ namespace UA
     GCHandle native_setter;
 
     UA::ManagedClientVariableSetterCallback^ managed_setter_callback;
-
     UA::NativeClientVariableSetterCallback native_setter_callback;
 
     void SetterCallback(ua::variant& input);

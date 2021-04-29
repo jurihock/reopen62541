@@ -1,6 +1,7 @@
 #pragma once
 
 #include <reopen62541-cli/Convert.h>
+#include <reopen62541-cli/Log.h>
 #include <reopen62541-cli/Variant.h>
 
 #include <reopen62541/client.h>
@@ -24,6 +25,8 @@ namespace UA
   public ref class Client : public IDisposable
   {
   public:
+
+    event EventHandler<LogEventArgs^>^ LogChanged;
 
     Client(int portnumber, String^ hostname);
     Client(int portnumber, String^ hostname, int timeout);
@@ -66,5 +69,7 @@ namespace UA
     bool disposed;
 
     ua::client* client;
+
+    void LogCallback(UA::LogLevel level, UA::LogCategory category, String^ message);
   };
 }

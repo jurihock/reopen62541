@@ -1,5 +1,6 @@
 #include <reopen62541-cli/Server.h>
 
+#include <reopen62541-cli/Adapters/LogCallbackAdapter.h>
 #include <reopen62541-cli/Adapters/GenericServerVariableCallbackAdapter.h>
 #include <reopen62541-cli/Adapters/ServerVariableCallbackAdapter.h>
 #include <reopen62541-cli/Adapters/ServerMethodCallbackAdapter.h>
@@ -18,15 +19,20 @@ UA::Server::Server(int portnumber, String^ hostname, String^ name, String^ uri) 
     name_std,
     uri_std);
 
-  //server->add_log_callback()
+  auto server_log_callback = gcnew Action<UA::LogLevel, UA::LogCategory, String^>(this, &UA::Server::LogCallback);
+  auto server_log_adapter = gcnew UA::LogCallbackAdapter(server_log_callback);
+  server->add_log_callback(server_log_adapter->NativeLogCallback);
 }
 
 UA::Server::Server() :
-  disposed(false)
+  disposed(false),
+  server(nullptr)
 {
   server = new ua::server();
 
-  //server->add_log_callback()
+  auto server_log_callback = gcnew Action<UA::LogLevel, UA::LogCategory, String^>(this, &UA::Server::LogCallback);
+  auto server_log_adapter = gcnew UA::LogCallbackAdapter(server_log_callback);
+  server->add_log_callback(server_log_adapter->NativeLogCallback);
 }
 
 UA::Server::~Server()
@@ -217,4 +223,9 @@ void UA::Server::AddMethod(
     inputs_std,
     outputs_std,
     adapter->NativeActionCallback);
+}
+
+void UA::Server::LogCallback(UA::LogLevel level, UA::LogCategory category, String^ message)
+{
+  LogChanged(this, gcnew LogEventArgs(level, category, message));
 }
