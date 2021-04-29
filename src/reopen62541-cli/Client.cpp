@@ -75,7 +75,18 @@ void UA::Client::Connect()
     throw gcnew ObjectDisposedException(nameof(Client));
   }
 
-  client->connect();
+  try
+  {
+    client->connect();
+  }
+  catch (const ua::client_error& e)
+  {
+    throw gcnew UA::ClientException(e);
+  }
+  catch (const std::exception& e)
+  {
+    throw gcnew Exception(UA::Convert::ToString(e.what()));
+  }
 }
 
 void UA::Client::Disconnect()

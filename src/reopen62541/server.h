@@ -2,7 +2,7 @@
 
 #include <reopen62541/argument.h>
 #include <reopen62541/convert.h>
-#include <reopen62541/error.h>
+#include <reopen62541/exception.h>
 #include <reopen62541/strings.h>
 #include <reopen62541/uid.h>
 #include <reopen62541/variant.h>
