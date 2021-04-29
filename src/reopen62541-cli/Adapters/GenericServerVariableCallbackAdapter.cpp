@@ -55,18 +55,6 @@ UA::GenericServerVariableCallbackAdapter<T>::!GenericServerVariableCallbackAdapt
 }
 
 generic<class T>
-UA::NativeServerVariableGetterCallback UA::GenericServerVariableCallbackAdapter<T>::GetNativeGetterCallback()
-{
-  return native_getter_callback;
-}
-
-generic<class T>
-UA::NativeServerVariableSetterCallback UA::GenericServerVariableCallbackAdapter<T>::GetNativeSetterCallback()
-{
-  return native_setter_callback;
-}
-
-generic<class T>
 void UA::GenericServerVariableCallbackAdapter<T>::GetterCallback(ua::variant& output)
 {
   UA::Variant variant(output);

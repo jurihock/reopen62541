@@ -51,16 +51,6 @@ UA::ServerVariableCallbackAdapter::!ServerVariableCallbackAdapter()
   }
 }
 
-UA::NativeServerVariableGetterCallback UA::ServerVariableCallbackAdapter::GetNativeGetterCallback()
-{
-  return native_getter_callback;
-}
-
-UA::NativeServerVariableSetterCallback UA::ServerVariableCallbackAdapter::GetNativeSetterCallback()
-{
-  return native_setter_callback;
-}
-
 void UA::ServerVariableCallbackAdapter::GetterCallback(ua::variant& output)
 {
   auto variant = gcnew UA::Variant(output);

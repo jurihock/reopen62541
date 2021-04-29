@@ -99,7 +99,7 @@ T UA::Client::Get(
   client->get(
     name_std,
     path_std,
-    adapter->GetNativeGetterCallback());
+    adapter->NativeGetterCallback);
 
   return adapter->Value;
 }
@@ -122,7 +122,7 @@ void UA::Client::Get(
   client->get(
     name_std,
     path_std,
-    adapter->GetNativeGetterCallback());
+    adapter->NativeGetterCallback);
 }
 
 generic<class T>
@@ -144,7 +144,7 @@ void UA::Client::Set(
   client->set(
     name_std,
     path_std,
-    adapter->GetNativeSetterCallback());
+    adapter->NativeSetterCallback);
 }
 
 void UA::Client::Set(
@@ -165,7 +165,7 @@ void UA::Client::Set(
   client->set(
     name_std,
     path_std,
-    adapter->GetNativeSetterCallback());
+    adapter->NativeSetterCallback);
 }
 
 void UA::Client::Call(
@@ -187,6 +187,6 @@ void UA::Client::Call(
   client->call(
     name_std,
     path_std,
-    adapter->GetNativeRequestCallback(),
-    adapter->GetNativeResponseCallback());
+    adapter->NativeRequestCallback,
+    adapter->NativeResponseCallback);
 }

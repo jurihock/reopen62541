@@ -23,11 +23,6 @@ UA::ServerMethodCallbackAdapter::!ServerMethodCallbackAdapter()
   }
 }
 
-UA::NativeServerMethodCallback UA::ServerMethodCallbackAdapter::GetNativeActionCallback()
-{
-  return native_action_callback;
-}
-
 void UA::ServerMethodCallbackAdapter::ActionCallback(const ua::variant& input, ua::variant& output)
 {
   auto variant_input = gcnew UA::Variant(input);

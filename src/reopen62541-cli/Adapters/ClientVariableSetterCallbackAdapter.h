@@ -16,11 +16,14 @@ namespace UA
   {
   public:
 
+    property UA::NativeClientVariableSetterCallback NativeSetterCallback
+    {
+      UA::NativeClientVariableSetterCallback get() { return native_setter_callback; }
+    }
+
     ClientVariableSetterCallbackAdapter(Action<UA::Variant^>^ setter);
     ~ClientVariableSetterCallbackAdapter();
     !ClientVariableSetterCallbackAdapter();
-
-    UA::NativeClientVariableSetterCallback GetNativeSetterCallback();
 
   private:
 

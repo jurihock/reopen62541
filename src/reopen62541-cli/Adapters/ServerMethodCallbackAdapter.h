@@ -16,11 +16,14 @@ namespace UA
   {
   public:
 
+    property UA::NativeServerMethodCallback NativeActionCallback
+    {
+      UA::NativeServerMethodCallback get() { return native_action_callback; }
+    }
+
     ServerMethodCallbackAdapter(Action<UA::Variant^, UA::Variant^>^ action);
     ~ServerMethodCallbackAdapter();
     !ServerMethodCallbackAdapter();
-
-    UA::NativeServerMethodCallback GetNativeActionCallback();
 
   private:
 

@@ -136,8 +136,8 @@ void UA::Server::AddVariable(
     path_std,
     datatype,
     valuerank,
-    adapter->GetNativeGetterCallback(),
-    adapter->GetNativeSetterCallback());
+    adapter->NativeGetterCallback,
+    adapter->NativeSetterCallback);
 }
 
 generic<class T>
@@ -167,8 +167,8 @@ void UA::Server::AddVariable(
     path_std,
     datatype,
     valuerank,
-    adapter->GetNativeGetterCallback(),
-    adapter->GetNativeSetterCallback());
+    adapter->NativeGetterCallback,
+    adapter->NativeSetterCallback);
 }
 
 void UA::Server::AddMethod(
@@ -216,5 +216,5 @@ void UA::Server::AddMethod(
     path_std,
     inputs_std,
     outputs_std,
-    adapter->GetNativeActionCallback());
+    adapter->NativeActionCallback);
 }

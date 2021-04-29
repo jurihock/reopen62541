@@ -23,11 +23,14 @@ namespace UA
       void set(T value) { this->value = value; }
     }
 
+    property UA::NativeClientVariableSetterCallback NativeSetterCallback
+    {
+      UA::NativeClientVariableSetterCallback get() { return native_setter_callback; }
+    }
+
     GenericClientVariableSetterCallbackAdapter(T value);
     ~GenericClientVariableSetterCallbackAdapter();
     !GenericClientVariableSetterCallbackAdapter();
-
-    UA::NativeClientVariableSetterCallback GetNativeSetterCallback();
 
   private:
 

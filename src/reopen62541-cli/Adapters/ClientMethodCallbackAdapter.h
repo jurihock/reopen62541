@@ -16,12 +16,19 @@ namespace UA
   {
   public:
 
+    property UA::NativeClientMethodRequestCallback NativeRequestCallback
+    {
+      UA::NativeClientMethodRequestCallback get() { return native_request_callback; }
+    }
+
+    property UA::NativeClientMethodResponseCallback NativeResponseCallback
+    {
+      UA::NativeClientMethodResponseCallback get() { return native_response_callback; }
+    }
+
     ClientMethodCallbackAdapter(Action<UA::Variant^>^ request, Action<UA::Variant^>^ response);
     ~ClientMethodCallbackAdapter();
     !ClientMethodCallbackAdapter();
-
-    UA::NativeClientMethodRequestCallback GetNativeRequestCallback();
-    UA::NativeClientMethodResponseCallback GetNativeResponseCallback();
 
   private:
 

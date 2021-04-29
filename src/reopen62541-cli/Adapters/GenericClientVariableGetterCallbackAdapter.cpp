@@ -27,12 +27,6 @@ UA::GenericClientVariableGetterCallbackAdapter<T>::!GenericClientVariableGetterC
 }
 
 generic<class T>
-UA::NativeClientVariableGetterCallback UA::GenericClientVariableGetterCallbackAdapter<T>::GetNativeGetterCallback()
-{
-  return native_getter_callback;
-}
-
-generic<class T>
 void UA::GenericClientVariableGetterCallbackAdapter<T>::GetterCallback(const ua::variant& output)
 {
   UA::Variant variant(output);

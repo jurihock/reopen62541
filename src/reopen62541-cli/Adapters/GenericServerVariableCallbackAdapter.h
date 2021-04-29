@@ -17,12 +17,19 @@ namespace UA
   {
   public:
 
+    property UA::NativeServerVariableGetterCallback NativeGetterCallback
+    {
+      UA::NativeServerVariableGetterCallback get() { return native_getter_callback; }
+    }
+
+    property UA::NativeServerVariableSetterCallback NativeSetterCallback
+    {
+      UA::NativeServerVariableSetterCallback get() { return native_setter_callback; }
+    }
+
     GenericServerVariableCallbackAdapter(Func<T>^ getter, Action<T>^ setter);
     ~GenericServerVariableCallbackAdapter();
     !GenericServerVariableCallbackAdapter();
-
-    UA::NativeServerVariableGetterCallback GetNativeGetterCallback();
-    UA::NativeServerVariableSetterCallback GetNativeSetterCallback();
 
   private:
 

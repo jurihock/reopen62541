@@ -51,16 +51,6 @@ UA::ClientMethodCallbackAdapter::!ClientMethodCallbackAdapter()
   }
 }
 
-UA::NativeClientMethodRequestCallback UA::ClientMethodCallbackAdapter::GetNativeRequestCallback()
-{
-  return native_request_callback;
-}
-
-UA::NativeClientMethodResponseCallback UA::ClientMethodCallbackAdapter::GetNativeResponseCallback()
-{
-  return native_response_callback;
-}
-
 void UA::ClientMethodCallbackAdapter::RequestCallback(ua::variant& input)
 {
   auto variant = gcnew UA::Variant(input);

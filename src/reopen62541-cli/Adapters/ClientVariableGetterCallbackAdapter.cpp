@@ -31,11 +31,6 @@ UA::ClientVariableGetterCallbackAdapter::!ClientVariableGetterCallbackAdapter()
   }
 }
 
-UA::NativeClientVariableGetterCallback UA::ClientVariableGetterCallbackAdapter::GetNativeGetterCallback()
-{
-  return native_getter_callback;
-}
-
 void UA::ClientVariableGetterCallbackAdapter::GetterCallback(const ua::variant& output)
 {
   auto variant = gcnew UA::Variant(output);

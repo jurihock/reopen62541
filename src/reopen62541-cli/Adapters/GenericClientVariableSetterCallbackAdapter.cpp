@@ -27,12 +27,6 @@ UA::GenericClientVariableSetterCallbackAdapter<T>::!GenericClientVariableSetterC
 }
 
 generic<class T>
-UA::NativeClientVariableSetterCallback UA::GenericClientVariableSetterCallbackAdapter<T>::GetNativeSetterCallback()
-{
-  return native_setter_callback;
-}
-
-generic<class T>
 void UA::GenericClientVariableSetterCallbackAdapter<T>::SetterCallback(ua::variant& input)
 {
   UA::Variant variant(input);
