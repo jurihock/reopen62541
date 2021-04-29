@@ -103,7 +103,7 @@ namespace ua
     }
 
     template<typename T>
-    static ua::argument custom(const std::string& name, const std::string& description, const std::vector<uint32_t>& dimensions)
+    static ua::argument array(const std::string& name, const std::string& description, const std::vector<uint32_t>& dimensions)
     {
       return ua::argument(name, description, ua::convert::to_ua_data_type<T>(), dimensions);
     }
