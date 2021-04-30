@@ -2,3 +2,6 @@
 build*/
 cmake-build-*/
 docs*/
+
+AssemblyInfo.h
+AssemblyInfo.cpp
