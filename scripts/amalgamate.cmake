@@ -2,10 +2,18 @@
 # extracts include directives and source code,
 # writes concatenated results to DST directory
 
+file(READ "${CMAKE_CURRENT_LIST_DIR}/../VERSION" VERSION)
+string(STRIP "${VERSION}" VERSION)
+
+set(META)
+list(APPEND META "// SOURCE  https://github.com/jurihock/reopen62541")
+list(APPEND META "// VERSION ${VERSION}")
+list(JOIN META "\n" META)
+
 set(SRC "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/reopen62541")
 set(DST "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}")
 
-set(FILES convert error strings uid argument variant client server)
+set(FILES convert exception strings uid argument variant client server)
 set(TYPES h cpp)
 
 foreach(TYPE ${TYPES})
@@ -76,6 +84,7 @@ foreach(TYPE ${TYPES})
 
     list(PREPEND HEAD "#include \"open62541.h\"\n\n")
     list(PREPEND HEAD "#pragma once\n\n")
+    list(PREPEND HEAD "${META}\n\n")
 
     list(JOIN HEAD "" HEAD)
     list(JOIN BODY "" BODY)
@@ -93,6 +102,7 @@ foreach(TYPE ${TYPES})
     list(SORT HEAD)
 
     list(PREPEND HEAD "#include \"reopen62541.h\"\n\n")
+    list(PREPEND HEAD "${META}\n\n")
 
     list(JOIN HEAD "" HEAD)
     list(JOIN BODY "" BODY)
