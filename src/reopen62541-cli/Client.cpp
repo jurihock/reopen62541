@@ -7,45 +7,33 @@
 #include <reopen62541-cli/Adapters/ClientVariableSetterCallbackAdapter.h>
 #include <reopen62541-cli/Adapters/ClientMethodCallbackAdapter.h>
 
-UA::Client::Client(int portnumber, String^ hostname) :
+UA::Client::Client(ua::client* client) :
   disposed(false),
-  client(nullptr)
+  client(client)
 {
-  const auto hostname_std = UA::Convert::ToStdString(hostname);
-
-  client = new ua::client(
-    portnumber,
-    hostname_std);
-
   auto client_log_callback = gcnew Action<UA::LogLevel, UA::LogCategory, String^>(this, &UA::Client::LogCallback);
   auto client_log_adapter = gcnew UA::LogCallbackAdapter(client_log_callback);
   client->add_log_callback(client_log_adapter->NativeLogCallback);
 }
 
 UA::Client::Client(int portnumber, String^ hostname, int timeout) :
-  disposed(false),
-  client(nullptr)
+  UA::Client::Client(new ua::client(portnumber, UA::Convert::ToStdString(hostname), timeout))
 {
-  const auto hostname_std = UA::Convert::ToStdString(hostname);
+}
 
-  client = new ua::client(
-    portnumber,
-    hostname_std,
-    timeout);
+UA::Client::Client(int portnumber, String^ hostname) :
+  UA::Client::Client(new ua::client(portnumber, UA::Convert::ToStdString(hostname)))
+{
+}
 
-  auto client_log_callback = gcnew Action<UA::LogLevel, UA::LogCategory, String^>(this, &UA::Client::LogCallback);
-  auto client_log_adapter = gcnew UA::LogCallbackAdapter(client_log_callback);
-  client->add_log_callback(client_log_adapter->NativeLogCallback);
+UA::Client::Client(int portnumber) :
+  UA::Client::Client(new ua::client(portnumber))
+{
 }
 
 UA::Client::Client() :
-  disposed(false)
+  UA::Client::Client(new ua::client())
 {
-  client = new ua::client();
-
-  auto client_log_callback = gcnew Action<UA::LogLevel, UA::LogCategory, String^>(this, &UA::Client::LogCallback);
-  auto client_log_adapter = gcnew UA::LogCallbackAdapter(client_log_callback);
-  client->add_log_callback(client_log_adapter->NativeLogCallback);
 }
 
 UA::Client::~Client()

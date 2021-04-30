@@ -34,6 +34,8 @@ namespace UA
     event EventHandler<LogEventArgs^>^ LogChanged;
 
     Server(int portnumber, String^ hostname, String^ name, String^ uri);
+    Server(int portnumber, String^ hostname);
+    Server(int portnumber);
     Server();
     ~Server();
     !Server();
@@ -87,6 +89,8 @@ namespace UA
     ua::server* server;
 
     Thread^ thread;
+
+    Server(ua::server* server);
 
     void LogCallback(UA::LogLevel level, UA::LogCategory category, String^ message);
   };

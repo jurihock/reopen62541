@@ -32,8 +32,7 @@ namespace ua
   {
   public:
 
-    client(const int portnumber, const std::string& hostname, const int timeout = 5000);
-    client();
+    client(const int portnumber = 4840, const std::string& hostname = "localhost", const int timeout = 5000);
     ~client();
 
     int portnumber() const;

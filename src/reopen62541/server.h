@@ -42,8 +42,7 @@ namespace ua
   {
   public:
 
-    server(const int portnumber, const std::string& hostname, const std::string& name, const std::string& uri);
-    server();
+    server(const int portnumber = 4840, const std::string& hostname = "localhost", const std::string& name = "open62541", const std::string& uri = "urn:open62541");
     ~server();
 
     int portnumber() const;

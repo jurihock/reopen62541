@@ -5,34 +5,33 @@
 #include <reopen62541-cli/Adapters/ServerVariableCallbackAdapter.h>
 #include <reopen62541-cli/Adapters/ServerMethodCallbackAdapter.h>
 
-UA::Server::Server(int portnumber, String^ hostname, String^ name, String^ uri) :
+UA::Server::Server(ua::server* server) :
   disposed(false),
-  server(nullptr)
+  server(server)
 {
-  const auto hostname_std = UA::Convert::ToStdString(hostname);
-  const auto name_std = UA::Convert::ToStdString(name);
-  const auto uri_std = UA::Convert::ToStdString(uri);
-
-  server = new ua::server(
-    portnumber,
-    hostname_std,
-    name_std,
-    uri_std);
-
   auto server_log_callback = gcnew Action<UA::LogLevel, UA::LogCategory, String^>(this, &UA::Server::LogCallback);
   auto server_log_adapter = gcnew UA::LogCallbackAdapter(server_log_callback);
   server->add_log_callback(server_log_adapter->NativeLogCallback);
 }
 
-UA::Server::Server() :
-  disposed(false),
-  server(nullptr)
+UA::Server::Server(int portnumber, String^ hostname, String^ name, String^ uri) :
+  UA::Server::Server(new ua::server(portnumber, UA::Convert::ToStdString(hostname), UA::Convert::ToStdString(name), UA::Convert::ToStdString(uri)))
 {
-  server = new ua::server();
+}
 
-  auto server_log_callback = gcnew Action<UA::LogLevel, UA::LogCategory, String^>(this, &UA::Server::LogCallback);
-  auto server_log_adapter = gcnew UA::LogCallbackAdapter(server_log_callback);
-  server->add_log_callback(server_log_adapter->NativeLogCallback);
+UA::Server::Server(int portnumber, String^ hostname) :
+  UA::Server::Server(new ua::server(portnumber, UA::Convert::ToStdString(hostname)))
+{
+}
+
+UA::Server::Server(int portnumber) :
+  UA::Server::Server(new ua::server(portnumber))
+{
+}
+
+UA::Server::Server() :
+  UA::Server::Server(new ua::server())
+{
 }
 
 UA::Server::~Server()

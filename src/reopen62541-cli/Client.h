@@ -34,8 +34,9 @@ namespace UA
 
     event EventHandler<LogEventArgs^>^ LogChanged;
 
-    Client(int portnumber, String^ hostname);
     Client(int portnumber, String^ hostname, int timeout);
+    Client(int portnumber, String^ hostname);
+    Client(int portnumber);   
     Client();
     ~Client();
     !Client();
@@ -79,6 +80,8 @@ namespace UA
     bool disposed;
 
     ua::client* client;
+
+    Client(ua::client* client);
 
     void LogCallback(UA::LogLevel level, UA::LogCategory category, String^ message);
   };
