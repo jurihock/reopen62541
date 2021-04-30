@@ -28,6 +28,7 @@ namespace UA
     }
 
     GenericServerVariableCallbackAdapter(Func<T>^ getter, Action<T>^ setter);
+    GenericServerVariableCallbackAdapter(Func<T>^ getter);
     ~GenericServerVariableCallbackAdapter();
     !GenericServerVariableCallbackAdapter();
 

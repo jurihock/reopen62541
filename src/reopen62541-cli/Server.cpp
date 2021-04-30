@@ -152,6 +152,35 @@ void UA::Server::AddVariable(
   String^ name,
   String^ description,
   array<String^>^ path,
+  Func<T>^ getter)
+{
+  if (disposed || server == nullptr)
+  {
+    throw gcnew ObjectDisposedException(nameof(Server));
+  }
+
+  const auto name_std = UA::Convert::ToStdString(name);
+  const auto description_std = UA::Convert::ToStdString(description);
+  const auto path_std = UA::Convert::ToStdStringVector(path);
+
+  auto datatype = UA::Convert::ToUaDataType<T>();
+  auto valuerank = UA::Convert::ToUaValueRank<T>();
+  auto adapter = gcnew UA::GenericServerVariableCallbackAdapter<T>(getter);
+
+  server->add_variable(
+    name_std,
+    description_std,
+    path_std,
+    datatype,
+    valuerank,
+    adapter->NativeGetterCallback);
+}
+
+generic<class T>
+void UA::Server::AddVariable(
+  String^ name,
+  String^ description,
+  array<String^>^ path,
   Func<T>^ getter,
   Action<T>^ setter)
 {
@@ -167,6 +196,36 @@ void UA::Server::AddVariable(
   auto datatype = UA::Convert::ToUaDataType<T>();
   auto valuerank = UA::Convert::ToUaValueRank<T>();
   auto adapter = gcnew UA::GenericServerVariableCallbackAdapter<T>(getter, setter);
+
+  server->add_variable(
+    name_std,
+    description_std,
+    path_std,
+    datatype,
+    valuerank,
+    adapter->NativeGetterCallback,
+    adapter->NativeSetterCallback);
+}
+
+generic<class T>
+void UA::Server::AddVariable(
+  String^ name,
+  String^ description,
+  array<String^>^ path,
+  Action<UA::Variant^>^ getter)
+{
+  if (disposed || server == nullptr)
+  {
+    throw gcnew ObjectDisposedException(nameof(Server));
+  }
+
+  const auto name_std = UA::Convert::ToStdString(name);
+  const auto description_std = UA::Convert::ToStdString(description);
+  const auto path_std = UA::Convert::ToStdStringVector(path);
+
+  auto datatype = UA::Convert::ToUaDataType<T>();
+  auto valuerank = UA::Convert::ToUaValueRank<T>();
+  auto adapter = gcnew UA::ServerVariableCallbackAdapter(getter);
 
   server->add_variable(
     name_std,

@@ -33,6 +33,11 @@ UA::ServerVariableCallbackAdapter::ServerVariableCallbackAdapter(Action<UA::Vari
   }
 }
 
+UA::ServerVariableCallbackAdapter::ServerVariableCallbackAdapter(Action<UA::Variant^>^ getter) :
+  UA::ServerVariableCallbackAdapter::ServerVariableCallbackAdapter(getter, nullptr)
+{
+}
+
 UA::ServerVariableCallbackAdapter::~ServerVariableCallbackAdapter()
 {
   this->!ServerVariableCallbackAdapter();

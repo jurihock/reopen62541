@@ -59,8 +59,22 @@ namespace UA
       String^ name,
       String^ description,
       array<String^>^ path,
+      Func<T>^ getter);
+
+    generic<class T>
+    void AddVariable(
+      String^ name,
+      String^ description,
+      array<String^>^ path,
       Func<T>^ getter,
       Action<T>^ setter);
+
+    generic<class T>
+    void AddVariable(
+      String^ name,
+      String^ description,
+      array<String^>^ path,
+      Action<UA::Variant^>^ getter);
 
     generic<class T>
     void AddVariable(

@@ -27,6 +27,7 @@ namespace UA
     }
 
     ServerVariableCallbackAdapter(Action<UA::Variant^>^ getter, Action<UA::Variant^>^ setter);
+    ServerVariableCallbackAdapter(Action<UA::Variant^>^ getter);
     ~ServerVariableCallbackAdapter();
     !ServerVariableCallbackAdapter();
 

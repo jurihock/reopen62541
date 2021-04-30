@@ -35,6 +35,12 @@ UA::GenericServerVariableCallbackAdapter<T>::GenericServerVariableCallbackAdapte
 }
 
 generic<class T>
+UA::GenericServerVariableCallbackAdapter<T>::GenericServerVariableCallbackAdapter(Func<T>^ getter) :
+  UA::GenericServerVariableCallbackAdapter<T>::GenericServerVariableCallbackAdapter(getter, nullptr)
+{
+}
+
+generic<class T>
 UA::GenericServerVariableCallbackAdapter<T>::~GenericServerVariableCallbackAdapter()
 {
   this->!GenericServerVariableCallbackAdapter();
