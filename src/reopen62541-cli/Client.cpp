@@ -50,9 +50,18 @@ UA::Client::!Client()
 {
   if (client != nullptr)
   {
-    client->disconnect();
-    delete client;
-    client = nullptr;
+    try
+    {
+      client->disconnect();
+    }
+    catch (...)
+    {
+    }
+    finally
+    {
+      delete client;
+      client = nullptr;
+    }
   }
 }
 
@@ -84,7 +93,39 @@ void UA::Client::Disconnect()
     throw gcnew ObjectDisposedException(nameof(Client));
   }
 
-  client->disconnect();
+  try
+  {
+    client->disconnect();
+  }
+  catch (const ua::client_error& e)
+  {
+    throw gcnew UA::ClientException(e);
+  }
+  catch (const std::exception& e)
+  {
+    throw gcnew Exception(UA::Convert::ToString(e.what()));
+  }
+}
+
+void UA::Client::Sync(int timeout)
+{
+  if (disposed || client == nullptr)
+  {
+    throw gcnew ObjectDisposedException(nameof(Client));
+  }
+
+  try
+  {
+    client->sync(timeout);
+  }
+  catch (const ua::client_error& e)
+  {
+    throw gcnew UA::ClientException(e);
+  }
+  catch (const std::exception& e)
+  {
+    throw gcnew Exception(UA::Convert::ToString(e.what()));
+  }
 }
 
 generic<class T>

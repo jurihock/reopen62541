@@ -24,7 +24,7 @@ ua::client::client(const int portnumber, const std::string& hostname, const int 
   }
 
   // custom timeout
-  client_config->timeout = timeout;
+  client_config->timeout = static_cast<uint32_t>(timeout);
 }
 
 ua::client::~client()
@@ -79,6 +79,23 @@ void ua::client::disconnect()
   const auto status = UA_Client_disconnect(client_instance.get());
 
   client_connected = false;
+
+  if (status != UA_STATUSCODE_GOOD)
+  {
+    throw ua::client_error(status);
+  }
+}
+
+void ua::client::sync(const int timeout) const
+{
+  if (client_connected)
+  {
+    return;
+  }
+
+  const auto status = UA_Client_run_iterate(
+    client_instance.get(),
+    static_cast<uint32_t>(timeout));
 
   if (status != UA_STATUSCODE_GOOD)
   {

@@ -44,6 +44,8 @@ namespace ua
     void connect();
     void disconnect();
 
+    void sync(const int timeout = 1000) const;
+
     void add_log_callback(
       std::function<ua::client_log_callback> callback);
 

@@ -44,6 +44,8 @@ namespace UA
     void Connect();
     void Disconnect();
 
+    void Sync(int timeout);
+
     generic<class T>
     T Get(
       String^ name,
