@@ -8,6 +8,34 @@ public class VariantTest
   static readonly string[] Scalars = { "Scalars" };
 
   [TestMethod]
+  public void UnicodeTest()
+  {
+    using (var server = new UA.Server())
+    {
+      server.AddObject(Scalars.First(), Scalars.First());
+
+      server.AddVariable<string>("en", "English", Scalars, () => "Hello World!");
+      server.AddVariable<string>("de", "Deutsch", Scalars, () => "Hallö Wält!");
+      server.AddVariable<string>("fr", "Français", Scalars, () => "Hællo Wœrld!");
+      server.AddVariable<string>("ru", "Русский", Scalars, () => "Превед Медвед!");
+      server.AddVariable<string>("ja", "日本語", Scalars, () => "アニメ映画!");
+
+      server.RunAsync();
+
+      using (var client = new UA.Client())
+      {
+        client.Connect();
+
+        Assert.AreEqual("Hello World!", client.Get<string>("en", Scalars));
+        Assert.AreEqual("Hallö Wält!", client.Get<string>("de", Scalars));
+        Assert.AreEqual("Hællo Wœrld!", client.Get<string>("fr", Scalars));
+        Assert.AreEqual("Превед Медвед!", client.Get<string>("ru", Scalars));
+        Assert.AreEqual("アニメ映画!", client.Get<string>("ja", Scalars));
+      }
+    }
+  }
+
+  [TestMethod]
   public void ScalarTest()
   {
     using (var server = new UA.Server())
