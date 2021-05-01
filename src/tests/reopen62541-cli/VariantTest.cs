@@ -11,6 +11,8 @@ public class VariantTest
   [TestMethod]
   public void EmptyStringTest()
   {
+    // empty scalar
+
     using (var server = new UA.Server())
     {
       server.AddObject(Scalars.First(), Scalars.First());
@@ -24,6 +26,43 @@ public class VariantTest
         client.Connect();
 
         Assert.AreEqual("", client.Get<string>(nameof(String), Scalars));
+      }
+    }
+
+    // vector with an empty scalar
+
+    using (var server = new UA.Server())
+    {
+      server.AddObject(Vectors.First(), Vectors.First());
+
+      server.AddVariable<string[]>(nameof(String), nameof(String), Vectors, () => new[] { "" });
+
+      server.RunAsync();
+
+      using (var client = new UA.Client())
+      {
+        client.Connect();
+
+        Assert.AreEqual(1, client.Get<string[]>(nameof(String), Vectors).Length);
+        Assert.AreEqual("", client.Get<string[]>(nameof(String), Vectors).First());
+      }
+    }
+
+    // empty vector
+
+    using (var server = new UA.Server())
+    {
+      server.AddObject(Vectors.First(), Vectors.First());
+
+      server.AddVariable<string[]>(nameof(String), nameof(String), Vectors, () => new string[0]);
+
+      server.RunAsync();
+
+      using (var client = new UA.Client())
+      {
+        client.Connect();
+
+        Assert.AreEqual(0, client.Get<string[]>(nameof(String), Vectors).Length);
       }
     }
   }
