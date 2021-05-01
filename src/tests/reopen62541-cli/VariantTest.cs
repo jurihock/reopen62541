@@ -8,7 +8,27 @@ public class VariantTest
   static readonly string[] Scalars = { "Scalars" };
 
   [TestMethod]
-  public void UnicodeTest()
+  public void EmptyStringTest()
+  {
+    using (var server = new UA.Server())
+    {
+      server.AddObject(Scalars.First(), Scalars.First());
+
+      server.AddVariable<string>(nameof(String), nameof(String), Scalars, () => "");
+
+      server.RunAsync();
+
+      using (var client = new UA.Client())
+      {
+        client.Connect();
+
+        Assert.AreEqual("", client.Get<string>(nameof(String), Scalars));
+      }
+    }
+  }
+
+  [TestMethod]
+  public void UnicodeStringTest()
   {
     using (var server = new UA.Server())
     {
