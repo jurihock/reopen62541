@@ -52,6 +52,12 @@ UA::Server::!Server()
     {
       server->shutdown();
     }
+    catch (...)
+    {
+      // the server could throw an
+      // exception on shutdown,
+      // so just ignore it in this context
+    }
     finally
     {
       delete server;
@@ -132,7 +138,18 @@ void UA::Server::Run()
     throw gcnew ObjectDisposedException(nameof(Server));
   }
 
-  server->run();
+  try
+  {
+    server->run();
+  }
+  catch (const ua::server_error& e)
+  {
+    throw gcnew UA::ServerException(e);
+  }
+  catch (const std::exception& e)
+  {
+    throw gcnew Exception(UA::Convert::ToString(e.what()));
+  }
 }
 
 void UA::Server::Shutdown()
@@ -142,13 +159,29 @@ void UA::Server::Shutdown()
     throw gcnew ObjectDisposedException(nameof(Server));
   }
 
-  server->shutdown();
-
-  if (thread != nullptr)
+  try
   {
-    if (!thread->Join(1000))
-      thread->Abort();
-    thread = nullptr;
+    server->shutdown();
+  }
+  catch (const ua::server_error& e)
+  {
+    throw gcnew UA::ServerException(e);
+  }
+  catch (const std::exception& e)
+  {
+    throw gcnew Exception(UA::Convert::ToString(e.what()));
+  }
+  finally
+  {
+    if (thread != nullptr)
+    {
+      if (!thread->Join(1000))
+      {
+        thread->Abort();
+      }
+
+      thread = nullptr;
+    }
   }
 }
 
@@ -166,10 +199,21 @@ void UA::Server::AddFolder(
   const auto description_std = UA::Convert::ToStdString(description);
   const auto path_std = UA::Convert::ToStdStringVector(path);
 
-  server->add_folder(
-    name_std,
-    description_std,
-    path_std);
+  try
+  {
+    server->add_folder(
+      name_std,
+      description_std,
+      path_std);
+  }
+  catch (const ua::server_error& e)
+  {
+    throw gcnew UA::ServerException(e);
+  }
+  catch (const std::exception& e)
+  {
+    throw gcnew Exception(UA::Convert::ToString(e.what()));
+  }
 }
 
 void UA::Server::AddObject(
@@ -186,10 +230,21 @@ void UA::Server::AddObject(
   const auto description_std = UA::Convert::ToStdString(description);
   const auto path_std = UA::Convert::ToStdStringVector(path);
 
-  server->add_object(
-    name_std,
-    description_std,
-    path_std);
+  try
+  {
+    server->add_object(
+      name_std,
+      description_std,
+      path_std);
+  }
+  catch (const ua::server_error& e)
+  {
+    throw gcnew UA::ServerException(e);
+  }
+  catch (const std::exception& e)
+  {
+    throw gcnew Exception(UA::Convert::ToString(e.what()));
+  }
 }
 
 generic<class T>
@@ -212,13 +267,24 @@ void UA::Server::AddVariable(
   auto valuerank = UA::Convert::ToUaValueRank<T>();
   auto adapter = gcnew UA::GenericServerVariableCallbackAdapter<T>(getter);
 
-  server->add_variable(
-    name_std,
-    description_std,
-    path_std,
-    datatype,
-    valuerank,
-    adapter->NativeGetterCallback);
+  try
+  {
+    server->add_variable(
+      name_std,
+      description_std,
+      path_std,
+      datatype,
+      valuerank,
+      adapter->NativeGetterCallback);
+  }
+  catch (const ua::server_error& e)
+  {
+    throw gcnew UA::ServerException(e);
+  }
+  catch (const std::exception& e)
+  {
+    throw gcnew Exception(UA::Convert::ToString(e.what()));
+  }
 }
 
 generic<class T>
@@ -242,14 +308,25 @@ void UA::Server::AddVariable(
   auto valuerank = UA::Convert::ToUaValueRank<T>();
   auto adapter = gcnew UA::GenericServerVariableCallbackAdapter<T>(getter, setter);
 
-  server->add_variable(
-    name_std,
-    description_std,
-    path_std,
-    datatype,
-    valuerank,
-    adapter->NativeGetterCallback,
-    adapter->NativeSetterCallback);
+  try
+  {
+    server->add_variable(
+      name_std,
+      description_std,
+      path_std,
+      datatype,
+      valuerank,
+      adapter->NativeGetterCallback,
+      adapter->NativeSetterCallback);
+  }
+  catch (const ua::server_error& e)
+  {
+    throw gcnew UA::ServerException(e);
+  }
+  catch (const std::exception& e)
+  {
+    throw gcnew Exception(UA::Convert::ToString(e.what()));
+  }
 }
 
 generic<class T>
@@ -272,14 +349,25 @@ void UA::Server::AddVariable(
   auto valuerank = UA::Convert::ToUaValueRank<T>();
   auto adapter = gcnew UA::ServerVariableCallbackAdapter(getter);
 
-  server->add_variable(
-    name_std,
-    description_std,
-    path_std,
-    datatype,
-    valuerank,
-    adapter->NativeGetterCallback,
-    adapter->NativeSetterCallback);
+  try
+  {
+    server->add_variable(
+      name_std,
+      description_std,
+      path_std,
+      datatype,
+      valuerank,
+      adapter->NativeGetterCallback,
+      adapter->NativeSetterCallback);
+  }
+  catch (const ua::server_error& e)
+  {
+    throw gcnew UA::ServerException(e);
+  }
+  catch (const std::exception& e)
+  {
+    throw gcnew Exception(UA::Convert::ToString(e.what()));
+  }
 }
 
 generic<class T>
@@ -303,14 +391,25 @@ void UA::Server::AddVariable(
   auto valuerank = UA::Convert::ToUaValueRank<T>();
   auto adapter = gcnew UA::ServerVariableCallbackAdapter(getter, setter);
 
-  server->add_variable(
-    name_std,
-    description_std,
-    path_std,
-    datatype,
-    valuerank,
-    adapter->NativeGetterCallback,
-    adapter->NativeSetterCallback);
+  try
+  {
+    server->add_variable(
+      name_std,
+      description_std,
+      path_std,
+      datatype,
+      valuerank,
+      adapter->NativeGetterCallback,
+      adapter->NativeSetterCallback);
+  }
+  catch (const ua::server_error& e)
+  {
+    throw gcnew UA::ServerException(e);
+  }
+  catch (const std::exception& e)
+  {
+    throw gcnew Exception(UA::Convert::ToString(e.what()));
+  }
 }
 
 void UA::Server::AddMethod(
@@ -352,13 +451,24 @@ void UA::Server::AddMethod(
 
   auto adapter = gcnew UA::ServerMethodCallbackAdapter(action);
 
-  server->add_method(
-    name_std,
-    description_std,
-    path_std,
-    inputs_std,
-    outputs_std,
-    adapter->NativeActionCallback);
+  try
+  {
+    server->add_method(
+      name_std,
+      description_std,
+      path_std,
+      inputs_std,
+      outputs_std,
+      adapter->NativeActionCallback);
+  }
+  catch (const ua::server_error& e)
+  {
+    throw gcnew UA::ServerException(e);
+  }
+  catch (const std::exception& e)
+  {
+    throw gcnew Exception(UA::Convert::ToString(e.what()));
+  }
 }
 
 void UA::Server::LogCallback(UA::LogLevel level, UA::LogCategory category, String^ message)

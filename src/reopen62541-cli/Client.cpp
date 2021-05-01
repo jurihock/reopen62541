@@ -58,7 +58,7 @@ UA::Client::!Client()
     {
       // the client could throw an
       // exception on disconnect,
-      // so just ignore it ar this point
+      // so just ignore it in this context
     }
     finally
     {
@@ -146,10 +146,21 @@ T UA::Client::Get(
 
   auto adapter = gcnew UA::GenericClientVariableGetterCallbackAdapter<T>();
 
-  client->get(
-    name_std,
-    path_std,
-    adapter->NativeGetterCallback);
+  try
+  {
+    client->get(
+      name_std,
+      path_std,
+      adapter->NativeGetterCallback);
+  }
+  catch (const ua::client_error& e)
+  {
+    throw gcnew UA::ClientException(e);
+  }
+  catch (const std::exception& e)
+  {
+    throw gcnew Exception(UA::Convert::ToString(e.what()));
+  }
 
   return adapter->Value;
 }
@@ -169,10 +180,21 @@ void UA::Client::Get(
 
   auto adapter = gcnew UA::ClientVariableGetterCallbackAdapter(getter);
 
-  client->get(
-    name_std,
-    path_std,
-    adapter->NativeGetterCallback);
+  try
+  {
+    client->get(
+      name_std,
+      path_std,
+      adapter->NativeGetterCallback);
+  }
+  catch (const ua::client_error& e)
+  {
+    throw gcnew UA::ClientException(e);
+  }
+  catch (const std::exception& e)
+  {
+    throw gcnew Exception(UA::Convert::ToString(e.what()));
+  }
 }
 
 generic<class T>
@@ -191,10 +213,21 @@ void UA::Client::Set(
 
   auto adapter = gcnew UA::GenericClientVariableSetterCallbackAdapter<T>(value);
 
-  client->set(
-    name_std,
-    path_std,
-    adapter->NativeSetterCallback);
+  try
+  {
+    client->set(
+      name_std,
+      path_std,
+      adapter->NativeSetterCallback);
+  }
+  catch (const ua::client_error& e)
+  {
+    throw gcnew UA::ClientException(e);
+  }
+  catch (const std::exception& e)
+  {
+    throw gcnew Exception(UA::Convert::ToString(e.what()));
+  }
 }
 
 void UA::Client::Set(
@@ -212,10 +245,21 @@ void UA::Client::Set(
 
   auto adapter = gcnew UA::ClientVariableSetterCallbackAdapter(setter);
 
-  client->set(
-    name_std,
-    path_std,
-    adapter->NativeSetterCallback);
+  try
+  {
+    client->set(
+      name_std,
+      path_std,
+      adapter->NativeSetterCallback);
+  }
+  catch (const ua::client_error& e)
+  {
+    throw gcnew UA::ClientException(e);
+  }
+  catch (const std::exception& e)
+  {
+    throw gcnew Exception(UA::Convert::ToString(e.what()));
+  }
 }
 
 void UA::Client::Call(
@@ -234,11 +278,22 @@ void UA::Client::Call(
 
   auto adapter = gcnew UA::ClientMethodCallbackAdapter(request, response);
 
-  client->call(
-    name_std,
-    path_std,
-    adapter->NativeRequestCallback,
-    adapter->NativeResponseCallback);
+  try
+  {
+    client->call(
+      name_std,
+      path_std,
+      adapter->NativeRequestCallback,
+      adapter->NativeResponseCallback);
+  }
+  catch (const ua::client_error& e)
+  {
+    throw gcnew UA::ClientException(e);
+  }
+  catch (const std::exception& e)
+  {
+    throw gcnew Exception(UA::Convert::ToString(e.what()));
+  }
 }
 
 void UA::Client::LogCallback(UA::LogLevel level, UA::LogCategory category, String^ message)
