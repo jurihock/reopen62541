@@ -49,12 +49,33 @@ namespace ua
     void add_log_callback(
       std::function<ua::client_log_callback> callback);
 
-    void get(
+    template<typename T>
+    T get(
+      const std::string& name,
+      const std::vector<std::string>& path)
+    {
+      T value;
+
+      read(name, path, [&](const ua::variant& output) { value = output.get<T>(); });
+
+      return value;
+    }
+
+    template<typename T>
+    void set(
+      const std::string& name,
+      const std::vector<std::string>& path,
+      const T value)
+    {
+      write(name, path, [&](ua::variant& input) { input.set<T>(value); });
+    }
+
+    void read(
       const std::string& name,
       const std::vector<std::string>& path,
       std::function<ua::client_variable_getter_callback> getter);
 
-    void set(
+    void write(
       const std::string& name,
       const std::vector<std::string>& path,
       std::function<ua::client_variable_setter_callback> setter);
@@ -62,8 +83,8 @@ namespace ua
     void call(
       const std::string& name,
       const std::vector<std::string>& path,
-      std::function<ua::client_method_request_callback> request,
-      std::function<ua::client_method_response_callback> response);
+      std::function<ua::client_method_request_callback> request = nullptr,
+      std::function<ua::client_method_response_callback> response = nullptr);
 
   protected:
 

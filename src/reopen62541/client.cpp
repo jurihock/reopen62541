@@ -109,7 +109,7 @@ void ua::client::add_log_callback(
   client_log_callbacks.push_back(callback);
 }
 
-void ua::client::get(
+void ua::client::read(
   const std::string& name,
   const std::vector<std::string>& path,
   std::function<ua::client_variable_getter_callback> getter)
@@ -141,7 +141,7 @@ void ua::client::get(
   UA_Variant_clear(&output);
 }
 
-void ua::client::set(
+void ua::client::write(
   const std::string& name,
   const std::vector<std::string>& path,
   std::function<ua::client_variable_setter_callback> setter)
@@ -186,8 +186,11 @@ void ua::client::call(
   std::vector<UA_Variant> inputs(ninputs);
   for (auto& input : inputs) UA_Variant_init(&input);
 
-  ua::variant request_variant(inputs.data(), inputs.size());
-  request(request_variant);
+  if (request != nullptr)
+  {
+    ua::variant request_variant(inputs.data(), inputs.size());
+    request(request_variant);
+  }
 
   UA_Variant* outputs;
 
@@ -214,8 +217,11 @@ void ua::client::call(
     throw ua::client_error(status);
   }
 
-  ua::variant response_variant(outputs, noutputs);
-  response(response_variant);
+  if (response != nullptr)
+  {
+    ua::variant response_variant(outputs, noutputs);
+    response(response_variant);
+  }
 
   for (auto& input : inputs) UA_Variant_clear(&input);
   UA_Array_delete(outputs, noutputs, &UA_TYPES[UA_TYPES_VARIANT]);

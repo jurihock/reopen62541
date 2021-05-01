@@ -148,7 +148,7 @@ T UA::Client::Get(
 
   try
   {
-    client->get(
+    client->read(
       name_std,
       path_std,
       adapter->NativeGetterCallback);
@@ -163,38 +163,6 @@ T UA::Client::Get(
   }
 
   return adapter->Value;
-}
-
-void UA::Client::Get(
-  String^ name,
-  array<String^>^ path,
-  Action<UA::Variant^>^ getter)
-{
-  if (disposed || client == nullptr)
-  {
-    throw gcnew ObjectDisposedException(nameof(Client));
-  }
-
-  const auto name_std = UA::Convert::ToStdString(name);
-  const auto path_std = UA::Convert::ToStdStringVector(path);
-
-  auto adapter = gcnew UA::ClientVariableGetterCallbackAdapter(getter);
-
-  try
-  {
-    client->get(
-      name_std,
-      path_std,
-      adapter->NativeGetterCallback);
-  }
-  catch (const ua::client_error& e)
-  {
-    throw gcnew UA::ClientException(e);
-  }
-  catch (const std::exception& e)
-  {
-    throw gcnew Exception(UA::Convert::ToString(e.what()));
-  }
 }
 
 generic<class T>
@@ -215,7 +183,7 @@ void UA::Client::Set(
 
   try
   {
-    client->set(
+    client->write(
       name_std,
       path_std,
       adapter->NativeSetterCallback);
@@ -230,7 +198,39 @@ void UA::Client::Set(
   }
 }
 
-void UA::Client::Set(
+void UA::Client::Read(
+  String^ name,
+  array<String^>^ path,
+  Action<UA::Variant^>^ getter)
+{
+  if (disposed || client == nullptr)
+  {
+    throw gcnew ObjectDisposedException(nameof(Client));
+  }
+
+  const auto name_std = UA::Convert::ToStdString(name);
+  const auto path_std = UA::Convert::ToStdStringVector(path);
+
+  auto adapter = gcnew UA::ClientVariableGetterCallbackAdapter(getter);
+
+  try
+  {
+    client->read(
+      name_std,
+      path_std,
+      adapter->NativeGetterCallback);
+  }
+  catch (const ua::client_error& e)
+  {
+    throw gcnew UA::ClientException(e);
+  }
+  catch (const std::exception& e)
+  {
+    throw gcnew Exception(UA::Convert::ToString(e.what()));
+  }
+}
+
+void UA::Client::Write(
   String^ name,
   array<String^>^ path,
   Action<UA::Variant^>^ setter)
@@ -247,7 +247,7 @@ void UA::Client::Set(
 
   try
   {
-    client->set(
+    client->write(
       name_std,
       path_std,
       adapter->NativeSetterCallback);

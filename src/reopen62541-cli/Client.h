@@ -51,18 +51,18 @@ namespace UA
       String^ name,
       array<String^>^ path);
 
-    void Get(
-      String^ name,
-      array<String^>^ path,
-      Action<UA::Variant^>^ getter);
-
     generic<class T>
     void Set(
       String^ name,
       array<String^>^ path,
       T value);
 
-    void Set(
+    void Read(
+      String^ name,
+      array<String^>^ path,
+      Action<UA::Variant^>^ getter);
+
+    void Write(
       String^ name,
       array<String^>^ path,
       Action<UA::Variant^>^ setter);

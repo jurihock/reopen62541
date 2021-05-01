@@ -46,42 +46,22 @@ struct calculator_client : calculator_interface, ua::client
 
   double bill() override
   {
-    double bill;
-
-    get("Bill", { "Calculator" }, [&](const ua::variant& output)
-    {
-      bill = output;
-    });
-
-    return bill;
+    return get<double>("Bill", { "Calculator" });
   }
 
-  void bill(double bill) override
+  void bill(double value) override
   {
-    set("Bill", { "Calculator" }, [&](ua::variant& input)
-    {
-      input = bill;
-    });
+    set<double>("Bill", { "Calculator" }, value);
   }
 
   double tip() override
   {
-    double tip;
-
-    get("Tip", { "Calculator" }, [&](const ua::variant& output)
-    {
-      tip = output;
-    });
-
-    return tip;
+    return get<double>("Tip", { "Calculator" });
   }
 
-  void tip(double tip) override
+  void tip(double value) override
   {
-    set("Tip", { "Calculator" }, [&](ua::variant& input)
-    {
-      input = tip;
-    });
+    set<double>("Tip", { "Calculator" }, value);
   }
 
   double calculate() override
@@ -89,9 +69,7 @@ struct calculator_client : calculator_interface, ua::client
     double result = 0;
 
     call("Calculate", { "Calculator" },
-      [&](ua::variant& input)
-      {
-      },
+      nullptr,
       [&](const ua::variant& output)
       {
         result = output;
