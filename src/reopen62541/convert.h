@@ -2,6 +2,7 @@
 
 #include <open62541.h>
 
+#include <codecvt>
 #include <string>
 #include <typeinfo>
 #include <vector>
@@ -11,19 +12,55 @@ namespace ua
   namespace convert
   {
     template<typename T>
-    static std::string to_string()
+    inline static std::string to_string()
     {
       return typeid(T).name();
     }
 
-    static std::string to_string(const UA_String* value)
+    inline static std::string to_string(const std::wstring& value)
     {
-      return std::string(reinterpret_cast<char*>(value->data), value->length);
+      // TODO: deprecated in C++17 
+      std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> convert;
+
+      return convert.to_bytes(value);
     }
 
-    static std::string to_string(const UA_String& value)
+    inline static std::string to_string(const char* value, const size_t size)
     {
-      return std::string(reinterpret_cast<char*>(value.data), value.length);
+      return std::string(value, size);
+    }
+
+    inline static std::wstring to_wstring(const std::string& value)
+    {
+      return std::wstring(value.begin(), value.end());
+    }
+
+    inline static std::wstring to_wstring(const char* value, const size_t size)
+    {
+      // TODO: deprecated in C++17
+      std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> convert;
+
+      return convert.from_bytes(value, value + size);
+    }
+
+    inline static std::string to_string(const UA_String& value)
+    {
+      return ua::convert::to_string(reinterpret_cast<char*>(value.data), value.length);
+    }
+
+    inline static std::string to_string(const UA_String* value)
+    {
+      return ua::convert::to_string(reinterpret_cast<char*>(value->data), value->length);
+    }
+
+    inline static std::wstring to_wstring(const UA_String& value)
+    {
+      return ua::convert::to_wstring(reinterpret_cast<char*>(value.data), value.length);
+    }
+
+    inline static std::wstring to_wstring(const UA_String* value)
+    {
+      return ua::convert::to_wstring(reinterpret_cast<char*>(value->data), value->length);
     }
 
     template<typename T>

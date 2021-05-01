@@ -24,9 +24,19 @@ namespace UA
       return msclr::interop::marshal_as<String^>(value);
     }
 
+    static String^ ToString(const std::wstring& value)
+    {
+      return msclr::interop::marshal_as<String^>(value);
+    }
+
     static std::string ToStdString(String^ value)
     {
       return msclr::interop::marshal_as<std::string>(value);
+    }
+
+    static std::wstring ToStdWideString(String^ value)
+    {
+      return msclr::interop::marshal_as<std::wstring>(value);
     }
 
     static std::vector<std::string> ToStdStringVector(... array<String^>^ values)
@@ -41,6 +51,23 @@ namespace UA
       for (long i = 0; i < values->LongLength; ++i)
       {
         values_std[i] = UA::Convert::ToStdString(values[i]);
+      }
+
+      return values_std;
+    }
+
+    static std::vector<std::wstring> ToStdWideStringVector(... array<String^>^ values)
+    {
+      if (values == nullptr)
+      {
+        throw gcnew ArgumentNullException(nameof(values));
+      }
+
+      std::vector<std::wstring> values_std(values->LongLength);
+
+      for (long i = 0; i < values->LongLength; ++i)
+      {
+        values_std[i] = UA::Convert::ToStdWideString(values[i]);
       }
 
       return values_std;

@@ -114,7 +114,7 @@ T UA::Variant::Get()
 
   if (T::typeid == String::typeid)
   {
-    const auto native_value = variant.get<std::string>();
+    const auto native_value = variant.get<std::wstring>();
     const auto managed_value = UA::Convert::ToString(native_value);
     return (T)managed_value;
   }
@@ -213,8 +213,8 @@ void UA::Variant::Set(T managed_value)
 
   if (T::typeid == String::typeid)
   {
-    const auto native_value = UA::Convert::ToStdString((String^)managed_value);
-    variant.set<>(native_value);
+    const auto native_value = UA::Convert::ToStdWideString((String^)managed_value);
+    variant.set<std::wstring>(native_value);
     return;
   }
 

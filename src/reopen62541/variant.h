@@ -1,5 +1,7 @@
 #pragma once
 
+#include <reopen62541/convert.h>
+
 #include <open62541.h>
 
 #include <string>
@@ -109,15 +111,15 @@ namespace ua
 
       if constexpr (std::is_same<T, std::string>::value)
       {
-        const UA_String* src = static_cast<UA_String*>(variant->data);
-        const std::string dst(reinterpret_cast<char*>(src->data), src->length);
+        const auto src = static_cast<UA_String*>(variant->data);
+        const auto dst = ua::convert::to_string(reinterpret_cast<char*>(src->data), src->length);
         return dst;
       }
 
       if constexpr (std::is_same<T, std::wstring>::value)
       {
-        const UA_String* src = static_cast<UA_String*>(variant->data);
-        const std::wstring dst(reinterpret_cast<wchar_t*>(src->data), src->length);
+        const auto src = static_cast<UA_String*>(variant->data);
+        const auto dst = ua::convert::to_wstring(reinterpret_cast<char*>(src->data), src->length);
         return dst;
       }
 
@@ -176,19 +178,19 @@ namespace ua
 
       else if constexpr (std::is_same<T, std::string>::value)
       {
-        UA_String copy = UA_String_fromChars(value.c_str());
-        UA_Variant_setScalarCopy(variant, &copy, &UA_TYPES[UA_TYPES_STRING]);
-        UA_String_deleteMembers(&copy);
+        const auto src = value + '\0';
+        auto dst = UA_String_fromChars(src.c_str());
+        UA_Variant_setScalarCopy(variant, &dst, &UA_TYPES[UA_TYPES_STRING]);
+        UA_String_deleteMembers(&dst);
       }
 
-      // TODO std::wstring
-
-      //else if constexpr (std::is_same<T, std::wstring>::value)
-      //{
-      //  UA_String copy = UA_String_fromChars(value.c_str());
-      //  UA_Variant_setScalarCopy(variant, &copy, &UA_TYPES[UA_TYPES_STRING]);
-      //  UA_String_deleteMembers(&copy);
-      //}
+      else if constexpr (std::is_same<T, std::wstring>::value)
+      {
+        const auto src = ua::convert::to_string(value) + '\0';
+        auto dst = UA_String_fromChars(src.c_str());
+        UA_Variant_setScalarCopy(variant, &dst, &UA_TYPES[UA_TYPES_STRING]);
+        UA_String_deleteMembers(&dst);
+      }
 
       // VECTORS
 
@@ -225,12 +227,33 @@ namespace ua
       else if constexpr (std::is_same<T, std::vector<std::string>>::value)
       {
         std::vector<UA_String> copy;
-
         copy.reserve(value.size());
 
         for (size_t i = 0; i < value.size(); ++i)
         {
-          copy.push_back(UA_String_fromChars(value[i].c_str()));
+          const auto src = value[i] + '\0';
+          auto dst = UA_String_fromChars(src.c_str());
+          copy.push_back(dst);
+        }
+
+        UA_Variant_setArrayCopy(variant, copy.data(), copy.size(), &UA_TYPES[UA_TYPES_STRING]);
+
+        for (size_t i = 0; i < copy.size(); ++i)
+        {
+          UA_String_deleteMembers(&copy[i]);
+        }
+      }
+
+      else if constexpr (std::is_same<T, std::vector<std::wstring>>::value)
+      {
+        std::vector<UA_String> copy;
+        copy.reserve(value.size());
+
+        for (size_t i = 0; i < value.size(); ++i)
+        {
+          const auto src = ua::convert::to_string(value[i]) + '\0';
+          auto dst = UA_String_fromChars(src.c_str());
+          copy.push_back(dst);
         }
 
         UA_Variant_setArrayCopy(variant, copy.data(), copy.size(), &UA_TYPES[UA_TYPES_STRING]);
