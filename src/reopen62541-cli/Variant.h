@@ -5,6 +5,7 @@
 #using <System.dll>
 
 using namespace System;
+using namespace System::Runtime::InteropServices;
 
 namespace UA
 {
