@@ -50,12 +50,7 @@ UA::Server::!Server()
   {
     try
     {
-      if (server->running())
-      {
-        server->shutdown();
-
-        Thread::Sleep(100); // FIXME
-      }
+      server->shutdown();
     }
     finally
     {
@@ -80,14 +75,35 @@ UA::Server::!Server()
   }
 }
 
-void UA::Server::Run()
+void UA::Server::RunAsyncPrep()
 {
   if (disposed || server == nullptr)
   {
     throw gcnew ObjectDisposedException(nameof(Server));
   }
 
-  server->run();
+  try
+  {
+    server->run_sync_begin();
+  }
+  catch (const ua::server_error& e)
+  {
+    throw gcnew UA::ClientException(e);
+  }
+  catch (const std::exception& e)
+  {
+    throw gcnew Exception(UA::Convert::ToString(e.what()));
+  }
+}
+
+void UA::Server::RunAsyncLoop()
+{
+  if (disposed || server == nullptr)
+  {
+    throw gcnew ObjectDisposedException(nameof(Server));
+  }
+
+  server->run_sync_loop();
 }
 
 void UA::Server::RunAsync()
@@ -102,11 +118,21 @@ void UA::Server::RunAsync()
     return;
   }
 
-  auto run = gcnew ThreadStart(this, &UA::Server::Run);
+  RunAsyncPrep();
 
-  (thread = gcnew Thread(run))->Start();
+  auto loop = gcnew ThreadStart(this, &UA::Server::RunAsyncLoop);
 
-  Thread::Sleep(1);
+  (thread = gcnew Thread(loop))->Start();
+}
+
+void UA::Server::Run()
+{
+  if (disposed || server == nullptr)
+  {
+    throw gcnew ObjectDisposedException(nameof(Server));
+  }
+
+  server->run();
 }
 
 void UA::Server::Shutdown()

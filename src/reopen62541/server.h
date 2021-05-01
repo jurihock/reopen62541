@@ -9,7 +9,6 @@
 
 #include <open62541.h>
 
-#include <chrono>
 #include <cstdarg>
 #include <functional>
 #include <map>
@@ -51,6 +50,11 @@ namespace ua
     const std::string& uri() const;
 
     bool running() const;
+
+    void run_sync_begin();
+    void run_sync_end();
+    void run_sync_step();
+    void run_sync_loop();
 
     #ifndef __cplusplus_cli
     void run_async();

@@ -41,8 +41,8 @@ namespace UA
     ~Server();
     !Server();
 
-    void Run();
     void RunAsync();
+    void Run();
     void Shutdown();
 
     void AddFolder(
@@ -106,6 +106,9 @@ namespace UA
     Thread^ thread;
 
     Server(ua::server* server);
+
+    void RunAsyncPrep();
+    void RunAsyncLoop();
 
     void LogCallback(UA::LogLevel level, UA::LogCategory category, String^ message);
   };

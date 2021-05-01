@@ -81,6 +81,56 @@ bool ua::server::running() const
   return server_running;
 }
 
+void ua::server::run_sync_begin()
+{
+  UA_StatusCode status = UA_STATUSCODE_GOOD;
+
+  if (!server_running)
+  {
+    status = UA_Server_run_startup(server_instance.get());
+
+    server_running = (status == UA_STATUSCODE_GOOD);
+  }
+
+  if (status != UA_STATUSCODE_GOOD)
+  {
+    throw ua::server_error(status);
+  }
+}
+
+void ua::server::run_sync_end()
+{
+  UA_StatusCode status = UA_STATUSCODE_GOOD;
+
+  if (server_running)
+  {
+    server_running = false;
+
+    status = UA_Server_run_shutdown(server_instance.get());
+  }
+
+  if (status != UA_STATUSCODE_GOOD)
+  {
+    throw ua::server_error(status);
+  }
+}
+
+void ua::server::run_sync_step()
+{
+  if (server_running)
+  {
+    UA_Server_run_iterate(server_instance.get(), true);
+  }
+}
+
+void ua::server::run_sync_loop()
+{
+  while (server_running)
+  {
+    UA_Server_run_iterate(server_instance.get(), true);
+  }
+}
+
 #ifndef __cplusplus_cli
 void ua::server::run_async()
 {
@@ -97,11 +147,10 @@ void ua::server::run_async()
     server_runner = nullptr;
   }
 
-  server_runner = std::shared_ptr<std::thread>(
-    new std::thread([this]() { run(); }));
+  run_sync_begin();
 
-  std::this_thread::sleep_for(
-    std::chrono::milliseconds(1));
+  server_runner = std::shared_ptr<std::thread>(
+    new std::thread([this]() { run_sync_loop(); }));
 }
 #endif
 
@@ -112,21 +161,13 @@ void ua::server::run()
     return;
   }
 
-  server_running = true;
-
-  const auto status = UA_Server_run(server_instance.get(), &server_running);
-
-  server_running = false;
-
-  if (status != UA_STATUSCODE_GOOD)
-  {
-    throw ua::server_error(status);
-  }
+  run_sync_begin();
+  run_sync_loop();
 }
 
 void ua::server::shutdown()
 {
-  server_running = false;
+  run_sync_end();
 
   if (server_runner != nullptr)
   {
