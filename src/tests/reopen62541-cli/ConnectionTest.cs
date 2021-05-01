@@ -21,17 +21,23 @@ public class ConnectionTest
     using (var server = new UA.Server())
     using (var client = new UA.Client())
     {
-      server.RunAsync();
-      Assert.IsTrue(server.IsRunning);
-      
-      client.Connect();
-      Assert.IsTrue(client.IsConnected);
+      for (var i = 0; i < 3; i++)
+      {
+        server.RunAsync();
+        Assert.IsTrue(server.IsRunning);
 
-      client.Disconnect();
-      Assert.IsFalse(client.IsConnected);
+        for (var j = 0; j < 3; j++)
+        {
+          client.Connect();
+          Assert.IsTrue(client.IsConnected);
 
-      server.Shutdown();
-      Assert.IsFalse(server.IsRunning);
+          client.Disconnect();
+          Assert.IsFalse(client.IsConnected);
+        }
+
+        server.Shutdown();
+        Assert.IsFalse(server.IsRunning);
+      }
     }
   }
 
@@ -66,7 +72,7 @@ public class ConnectionTest
   [TestMethod]
   public void DisposeConnectionTest()
   {
-    for (var i = 0; i < 10; i++)
+    for (var i = 0; i < 3; i++)
     {
       using (var server = new UA.Server())
       {
