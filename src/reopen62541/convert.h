@@ -104,6 +104,9 @@ namespace ua
       if constexpr (std::is_same<T, std::string>::value)
         return UA_TYPES_STRING;
 
+      if constexpr (std::is_same<T, std::wstring>::value)
+        return UA_TYPES_STRING;
+
       // VECTORS
 
       if constexpr (std::is_same<T, std::vector<bool>>::value)
@@ -140,6 +143,9 @@ namespace ua
         return UA_TYPES_DOUBLE;
 
       if constexpr (std::is_same<T, std::vector<std::string>>::value)
+        return UA_TYPES_STRING;
+
+      if constexpr (std::is_same<T, std::vector<std::wstring>>::value)
         return UA_TYPES_STRING;
 
       // ELSE
