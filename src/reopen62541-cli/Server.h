@@ -2,6 +2,7 @@
 
 #include <reopen62541-cli/Argument.h>
 #include <reopen62541-cli/Convert.h>
+#include <reopen62541-cli/Exception.h>
 #include <reopen62541-cli/Log.h>
 #include <reopen62541-cli/Variant.h>
 

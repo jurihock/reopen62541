@@ -48,16 +48,35 @@ UA::Server::!Server()
 {
   if (server != nullptr)
   {
-    server->shutdown();
-    delete server;
-    server = nullptr;
+    try
+    {
+      if (server->running())
+      {
+        server->shutdown();
+
+        Thread::Sleep(100); // FIXME
+      }
+    }
+    finally
+    {
+      delete server;
+      server = nullptr;
+    }
   }
 
   if (thread != nullptr)
   {
-    if (!thread->Join(1000))
-      thread->Abort();
-    thread = nullptr;
+    try
+    {
+      if (!thread->Join(1000))
+      {
+        thread->Abort();
+      }
+    }
+    finally
+    {
+      thread = nullptr;
+    }
   }
 }
 

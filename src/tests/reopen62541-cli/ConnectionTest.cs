@@ -38,7 +38,6 @@ public class ConnectionTest
   [TestMethod]
   public void BadConnectionTest()
   {
-    using (var server = new UA.Server())
     using (var client = new UA.Client())
     {
       try
@@ -61,6 +60,29 @@ public class ConnectionTest
 
       client.Disconnect();
       Assert.IsFalse(client.IsConnected);
+    }
+  }
+
+  [TestMethod]
+  public void DisposeConnectionTest()
+  {
+    for (var i = 0; i < 10; i++)
+    {
+      using (var server = new UA.Server())
+      {
+        server.RunAsync();
+        Assert.IsTrue(server.IsRunning);
+
+        using (var client = new UA.Client())
+        {
+          client.Connect();
+          Assert.IsTrue(client.IsConnected);
+
+          // don't disconnect client
+        }
+
+        // don't shutdown server
+      }
     }
   }
 }

@@ -56,6 +56,9 @@ UA::Client::!Client()
     }
     catch (...)
     {
+      // the client could throw an
+      // exception on disconnect,
+      // so just ignore it ar this point
     }
     finally
     {
