@@ -136,9 +136,10 @@ namespace ua
 
   protected:
 
-    static inline int NS = 0;
     static inline int NS0 = 0;
+    static inline int NS1 = 1;
     static inline char LC[] = "";
+
     ua::strings STRINGS;
     ua::uid UID;
 

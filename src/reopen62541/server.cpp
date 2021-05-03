@@ -49,6 +49,26 @@ ua::server::server(const int portnumber, const std::string& hostname, const std:
     UA_String_deleteMembers(&server_config->endpoints[i].server.applicationUri);
     server_config->endpoints[i].server.applicationUri = UA_STRING_ALLOC(STRINGS(uri)); // ALLOC
   }
+
+  // check namespace index
+  {
+    size_t ns;
+
+    const auto status = UA_Server_getNamespaceByName(server_instance.get(), UA_STRING(STRINGS(uri)), &ns);
+
+    if (status != UA_STATUSCODE_GOOD)
+    {
+      throw ua::server_error(status);
+    }
+
+    if (ns != NS1)
+    {
+      std::stringstream message;
+      message << "Unexpected namespace index for the specified application uri \"" << uri << "\"! ";
+      message << "Assumed " << NS1 << " got " << ns << ".";
+      throw std::runtime_error(message.str());
+    }
+  }
 }
 
 ua::server::~server()
@@ -198,13 +218,13 @@ void ua::server::add_folder(
   const auto node = UID(path, name);
   const auto parent = UID(path);
 
-  const auto node_id = UA_NODEID_STRING(NS, STRINGS(node));
-  const auto node_name = UA_QUALIFIEDNAME(NS, STRINGS(name));
+  const auto node_id = UA_NODEID_STRING(NS1, STRINGS(node));
+  const auto node_name = UA_QUALIFIEDNAME(NS1, STRINGS(name));
   const auto node_type = UA_NODEID_NUMERIC(NS0, UA_NS0ID_FOLDERTYPE);
 
   const auto parent_id = path.empty()
     ? UA_NODEID_NUMERIC(NS0, UA_NS0ID_OBJECTSFOLDER)
-    : UA_NODEID_STRING(NS, STRINGS(parent));
+    : UA_NODEID_STRING(NS1, STRINGS(parent));
   const auto parent_type = UA_NODEID_NUMERIC(NS0, UA_NS0ID_ORGANIZES);
 
   const auto status = UA_Server_addObjectNode(
@@ -238,13 +258,13 @@ void ua::server::add_object(
   const auto node = UID(path, name);
   const auto parent = UID(path);
 
-  const auto node_id = UA_NODEID_STRING(NS, STRINGS(node));
-  const auto node_name = UA_QUALIFIEDNAME(NS, STRINGS(name));
+  const auto node_id = UA_NODEID_STRING(NS1, STRINGS(node));
+  const auto node_name = UA_QUALIFIEDNAME(NS1, STRINGS(name));
   const auto node_type = UA_NODEID_NUMERIC(NS0, UA_NS0ID_BASEOBJECTTYPE);
 
   const auto parent_id = path.empty()
     ? UA_NODEID_NUMERIC(NS0, UA_NS0ID_OBJECTSFOLDER)
-    : UA_NODEID_STRING(NS, STRINGS(parent));
+    : UA_NODEID_STRING(NS1, STRINGS(parent));
   const auto parent_type = UA_NODEID_NUMERIC(NS0, UA_NS0ID_ORGANIZES);
 
   const auto status = UA_Server_addObjectNode(
@@ -294,11 +314,11 @@ void ua::server::add_variable(
   const auto node = UID(path, name);
   const auto parent = UID(path);
 
-  const auto node_id = UA_NODEID_STRING(NS, STRINGS(node));
-  const auto node_name = UA_QUALIFIEDNAME(NS, STRINGS(name));
+  const auto node_id = UA_NODEID_STRING(NS1, STRINGS(node));
+  const auto node_name = UA_QUALIFIEDNAME(NS1, STRINGS(name));
   const auto node_type = UA_NODEID_NUMERIC(NS0, UA_NS0ID_BASEDATAVARIABLETYPE);
 
-  const auto parent_id = UA_NODEID_STRING(NS, STRINGS(parent));
+  const auto parent_id = UA_NODEID_STRING(NS1, STRINGS(parent));
   const auto parent_type = UA_NODEID_NUMERIC(NS0, UA_NS0ID_HASCOMPONENT);
 
   const auto status = UA_Server_addDataSourceVariableNode(
@@ -392,10 +412,10 @@ void ua::server::add_method(
   const auto node = UID(path, name);
   const auto parent = UID(path);
 
-  const auto node_id = UA_NODEID_STRING(NS, STRINGS(node));
-  const auto node_name = UA_QUALIFIEDNAME(NS, STRINGS(name));
+  const auto node_id = UA_NODEID_STRING(NS1, STRINGS(node));
+  const auto node_name = UA_QUALIFIEDNAME(NS1, STRINGS(name));
 
-  const auto parent_id = UA_NODEID_STRING(NS, STRINGS(parent));
+  const auto parent_id = UA_NODEID_STRING(NS1, STRINGS(parent));
   const auto parent_type = UA_NODEID_NUMERIC(NS0, UA_NS0ID_HASCOMPONENT);
 
   const auto status = UA_Server_addMethodNode(
