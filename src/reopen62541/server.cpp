@@ -200,12 +200,12 @@ void ua::server::add_folder(
 
   const auto node_id = UA_NODEID_STRING(NS, STRINGS(node));
   const auto node_name = UA_QUALIFIEDNAME(NS, STRINGS(name));
-  const auto node_type = UA_NODEID_NUMERIC(NS, UA_NS0ID_FOLDERTYPE);
+  const auto node_type = UA_NODEID_NUMERIC(NS0, UA_NS0ID_FOLDERTYPE);
 
   const auto parent_id = path.empty()
-    ? UA_NODEID_NUMERIC(NS, UA_NS0ID_OBJECTSFOLDER)
+    ? UA_NODEID_NUMERIC(NS0, UA_NS0ID_OBJECTSFOLDER)
     : UA_NODEID_STRING(NS, STRINGS(parent));
-  const auto parent_type = UA_NODEID_NUMERIC(NS, UA_NS0ID_ORGANIZES);
+  const auto parent_type = UA_NODEID_NUMERIC(NS0, UA_NS0ID_ORGANIZES);
 
   const auto status = UA_Server_addObjectNode(
     server_instance.get(),
@@ -240,12 +240,12 @@ void ua::server::add_object(
 
   const auto node_id = UA_NODEID_STRING(NS, STRINGS(node));
   const auto node_name = UA_QUALIFIEDNAME(NS, STRINGS(name));
-  const auto node_type = UA_NODEID_NUMERIC(NS, UA_NS0ID_BASEOBJECTTYPE);
+  const auto node_type = UA_NODEID_NUMERIC(NS0, UA_NS0ID_BASEOBJECTTYPE);
 
   const auto parent_id = path.empty()
-    ? UA_NODEID_NUMERIC(NS, UA_NS0ID_OBJECTSFOLDER)
+    ? UA_NODEID_NUMERIC(NS0, UA_NS0ID_OBJECTSFOLDER)
     : UA_NODEID_STRING(NS, STRINGS(parent));
-  const auto parent_type = UA_NODEID_NUMERIC(NS, UA_NS0ID_ORGANIZES);
+  const auto parent_type = UA_NODEID_NUMERIC(NS0, UA_NS0ID_ORGANIZES);
 
   const auto status = UA_Server_addObjectNode(
     server_instance.get(),
@@ -296,10 +296,10 @@ void ua::server::add_variable(
 
   const auto node_id = UA_NODEID_STRING(NS, STRINGS(node));
   const auto node_name = UA_QUALIFIEDNAME(NS, STRINGS(name));
-  const auto node_type = UA_NODEID_NUMERIC(NS, UA_NS0ID_BASEDATAVARIABLETYPE);
+  const auto node_type = UA_NODEID_NUMERIC(NS0, UA_NS0ID_BASEDATAVARIABLETYPE);
 
   const auto parent_id = UA_NODEID_STRING(NS, STRINGS(parent));
-  const auto parent_type = UA_NODEID_NUMERIC(NS, UA_NS0ID_HASCOMPONENT);
+  const auto parent_type = UA_NODEID_NUMERIC(NS0, UA_NS0ID_HASCOMPONENT);
 
   const auto status = UA_Server_addDataSourceVariableNode(
     server_instance.get(),
@@ -396,7 +396,7 @@ void ua::server::add_method(
   const auto node_name = UA_QUALIFIEDNAME(NS, STRINGS(name));
 
   const auto parent_id = UA_NODEID_STRING(NS, STRINGS(parent));
-  const auto parent_type = UA_NODEID_NUMERIC(NS, UA_NS0ID_HASCOMPONENT);
+  const auto parent_type = UA_NODEID_NUMERIC(NS0, UA_NS0ID_HASCOMPONENT);
 
   const auto status = UA_Server_addMethodNode(
     server_instance.get(),

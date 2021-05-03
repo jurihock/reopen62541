@@ -89,6 +89,7 @@ namespace ua
   protected:
 
     static inline int NS = 0;
+    static inline int NS0 = 0;
     static inline char LC[] = "en";
     ua::strings STRINGS;
     ua::uid UID;
