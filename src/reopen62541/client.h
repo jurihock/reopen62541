@@ -90,7 +90,7 @@ namespace ua
 
     static inline int NS = 0;
     static inline int NS0 = 0;
-    static inline char LC[] = "en";
+    static inline char LC[] = "";
     ua::strings STRINGS;
     ua::uid UID;
 
