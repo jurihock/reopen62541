@@ -118,10 +118,8 @@ void ua::client::read(
   UA_Variant_init(&output);
 
   const auto node = UID(path, name);
-  const auto parent = UID(path);
 
   const auto node_id = UA_NODEID_STRING(NS, STRINGS(node));
-  const auto parent_id = UA_NODEID_STRING(NS, STRINGS(parent));
 
   const auto status = UA_Client_readValueAttribute(
     client_instance.get(),
@@ -153,10 +151,8 @@ void ua::client::write(
   setter(setter_variant);
 
   const auto node = UID(path, name);
-  const auto parent = UID(path);
 
   const auto node_id = UA_NODEID_STRING(NS, STRINGS(node));
-  const auto parent_id = UA_NODEID_STRING(NS, STRINGS(parent));
 
   const auto status = UA_Client_writeValueAttribute(
     client_instance.get(),
