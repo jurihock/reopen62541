@@ -1,8 +1,11 @@
 #pragma once
 
+#include <reopen62541/exception.h>
+
 #include <open62541.h>
 
 #include <codecvt>
+#include <memory>
 #include <string>
 #include <typeinfo>
 #include <vector>
@@ -61,6 +64,24 @@ namespace ua
     inline static std::wstring to_wstring(const UA_String* value)
     {
       return ua::convert::to_wstring(reinterpret_cast<char*>(value->data), value->length);
+    }
+
+    static std::shared_ptr<UA_NodeId> to_ua_node_id(const std::string& string_id)
+    {
+      UA_String ua_string_id = UA_STRING_ALLOC(string_id.c_str()); // ALLOC
+
+      UA_NodeId* ua_node_id = UA_NodeId_new();
+
+      const auto status = UA_NodeId_parse(ua_node_id, ua_string_id);
+
+      UA_String_clear(&ua_string_id);
+
+      if (status != UA_STATUSCODE_GOOD)
+      {
+        throw ua::status_code_error(status);
+      }
+
+      return std::shared_ptr<UA_NodeId>(ua_node_id, UA_NodeId_clear);
     }
 
     template<typename T>
