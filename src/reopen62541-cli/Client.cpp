@@ -166,6 +166,37 @@ T UA::Client::Get(
 }
 
 generic<class T>
+T UA::Client::Get(
+  String^ id)
+{
+  if (disposed || client == nullptr)
+  {
+    throw gcnew ObjectDisposedException(nameof(Client));
+  }
+
+  const auto id_std = UA::Convert::ToStdString(id);
+
+  auto adapter = gcnew UA::GenericClientVariableGetterCallbackAdapter<T>();
+
+  try
+  {
+    client->read(
+      id_std,
+      adapter->NativeGetterCallback);
+  }
+  catch (const ua::client_error& e)
+  {
+    throw gcnew UA::ClientException(e);
+  }
+  catch (const std::exception& e)
+  {
+    throw gcnew Exception(UA::Convert::ToString(e.what()));
+  }
+
+  return adapter->Value;
+}
+
+generic<class T>
 void UA::Client::Set(
   String^ name,
   array<String^>^ path,
@@ -186,6 +217,36 @@ void UA::Client::Set(
     client->write(
       name_std,
       path_std,
+      adapter->NativeSetterCallback);
+  }
+  catch (const ua::client_error& e)
+  {
+    throw gcnew UA::ClientException(e);
+  }
+  catch (const std::exception& e)
+  {
+    throw gcnew Exception(UA::Convert::ToString(e.what()));
+  }
+}
+
+generic<class T>
+void UA::Client::Set(
+  String^ id,
+  T value)
+{
+  if (disposed || client == nullptr)
+  {
+    throw gcnew ObjectDisposedException(nameof(Client));
+  }
+
+  const auto id_std = UA::Convert::ToStdString(id);
+
+  auto adapter = gcnew UA::GenericClientVariableSetterCallbackAdapter<T>(value);
+
+  try
+  {
+    client->write(
+      id_std,
       adapter->NativeSetterCallback);
   }
   catch (const ua::client_error& e)
@@ -230,6 +291,35 @@ void UA::Client::Read(
   }
 }
 
+void UA::Client::Read(
+  String^ id,
+  Action<UA::Variant^>^ getter)
+{
+  if (disposed || client == nullptr)
+  {
+    throw gcnew ObjectDisposedException(nameof(Client));
+  }
+
+  const auto id_std = UA::Convert::ToStdString(id);
+
+  auto adapter = gcnew UA::ClientVariableGetterCallbackAdapter(getter);
+
+  try
+  {
+    client->read(
+      id_std,
+      adapter->NativeGetterCallback);
+  }
+  catch (const ua::client_error& e)
+  {
+    throw gcnew UA::ClientException(e);
+  }
+  catch (const std::exception& e)
+  {
+    throw gcnew Exception(UA::Convert::ToString(e.what()));
+  }
+}
+
 void UA::Client::Write(
   String^ name,
   array<String^>^ path,
@@ -250,6 +340,35 @@ void UA::Client::Write(
     client->write(
       name_std,
       path_std,
+      adapter->NativeSetterCallback);
+  }
+  catch (const ua::client_error& e)
+  {
+    throw gcnew UA::ClientException(e);
+  }
+  catch (const std::exception& e)
+  {
+    throw gcnew Exception(UA::Convert::ToString(e.what()));
+  }
+}
+
+void UA::Client::Write(
+  String^ id,
+  Action<UA::Variant^>^ setter)
+{
+  if (disposed || client == nullptr)
+  {
+    throw gcnew ObjectDisposedException(nameof(Client));
+  }
+
+  const auto id_std = UA::Convert::ToStdString(id);
+
+  auto adapter = gcnew UA::ClientVariableSetterCallbackAdapter(setter);
+
+  try
+  {
+    client->write(
+      id_std,
       adapter->NativeSetterCallback);
   }
   catch (const ua::client_error& e)
@@ -283,6 +402,70 @@ void UA::Client::Call(
     client->call(
       name_std,
       path_std,
+      adapter->NativeRequestCallback,
+      adapter->NativeResponseCallback);
+  }
+  catch (const ua::client_error& e)
+  {
+    throw gcnew UA::ClientException(e);
+  }
+  catch (const std::exception& e)
+  {
+    throw gcnew Exception(UA::Convert::ToString(e.what()));
+  }
+}
+
+void UA::Client::Call(
+  Tuple<String^, String^>^ id,
+  Action<UA::Variant^>^ request,
+  Action<UA::Variant^>^ response)
+{
+  if (disposed || client == nullptr)
+  {
+    throw gcnew ObjectDisposedException(nameof(Client));
+  }
+
+  const auto method_id = UA::Convert::ToStdString(id->Item1);
+  const auto parent_std = UA::Convert::ToStdString(id->Item2);
+
+  auto adapter = gcnew UA::ClientMethodCallbackAdapter(request, response);
+
+  try
+  {
+    client->call(
+      { method_id, parent_std },
+      adapter->NativeRequestCallback,
+      adapter->NativeResponseCallback);
+  }
+  catch (const ua::client_error& e)
+  {
+    throw gcnew UA::ClientException(e);
+  }
+  catch (const std::exception& e)
+  {
+    throw gcnew Exception(UA::Convert::ToString(e.what()));
+  }
+}
+
+void UA::Client::Call(
+  ValueTuple<String^, String^>^ id,
+  Action<UA::Variant^>^ request,
+  Action<UA::Variant^>^ response)
+{
+  if (disposed || client == nullptr)
+  {
+    throw gcnew ObjectDisposedException(nameof(Client));
+  }
+
+  const auto method_id = UA::Convert::ToStdString(id->Item1);
+  const auto parent_std = UA::Convert::ToStdString(id->Item2);
+
+  auto adapter = gcnew UA::ClientMethodCallbackAdapter(request, response);
+
+  try
+  {
+    client->call(
+      { method_id, parent_std },
       adapter->NativeRequestCallback,
       adapter->NativeResponseCallback);
   }

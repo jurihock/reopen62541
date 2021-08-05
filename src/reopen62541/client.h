@@ -62,6 +62,28 @@ namespace ua
     }
 
     template<typename T>
+    T get(
+      const std::string& id)
+    {
+      T value;
+
+      read(id, [&](const ua::variant& output) { value = output.get<T>(); });
+
+      return value;
+    }
+
+    template<typename T>
+    T get(
+      const UA_NodeId node)
+    {
+      T value;
+
+      read(node, [&](const ua::variant& output) { value = output.get<T>(); });
+
+      return value;
+    }
+
+    template<typename T>
     void set(
       const std::string& name,
       const std::vector<std::string>& path,
@@ -70,9 +92,33 @@ namespace ua
       write(name, path, [&](ua::variant& input) { input.set<T>(value); });
     }
 
+    template<typename T>
+    void set(
+      const std::string& id,
+      const T value)
+    {
+      write(id, [&](ua::variant& input) { input.set<T>(value); });
+    }
+
+    template<typename T>
+    void set(
+      const UA_NodeId node,
+      const T value)
+    {
+      write(node, [&](ua::variant& input) { input.set<T>(value); });
+    }
+
     void read(
       const std::string& name,
       const std::vector<std::string>& path,
+      std::function<ua::client_variable_getter_callback> getter);
+
+    void read(
+      const std::string& id,
+      std::function<ua::client_variable_getter_callback> getter);
+
+    void read(
+      const UA_NodeId node,
       std::function<ua::client_variable_getter_callback> getter);
 
     void write(
@@ -80,9 +126,28 @@ namespace ua
       const std::vector<std::string>& path,
       std::function<ua::client_variable_setter_callback> setter);
 
+    void write(
+      const std::string& id,
+      std::function<ua::client_variable_setter_callback> setter);
+
+    void write(
+      const UA_NodeId node,
+      std::function<ua::client_variable_setter_callback> setter);
+
     void call(
       const std::string& name,
       const std::vector<std::string>& path,
+      std::function<ua::client_method_request_callback> request = nullptr,
+      std::function<ua::client_method_response_callback> response = nullptr);
+
+    void call(
+      const std::pair<std::string, std::string>& id,
+      std::function<ua::client_method_request_callback> request = nullptr,
+      std::function<ua::client_method_response_callback> response = nullptr);
+
+    void call(
+      const UA_NodeId node,
+      const UA_NodeId parent,
       std::function<ua::client_method_request_callback> request = nullptr,
       std::function<ua::client_method_response_callback> response = nullptr);
 
@@ -114,8 +179,7 @@ namespace ua
       va_list args);
 
     void get_method_nargs(
-      const std::string& name,
-      const std::vector<std::string>& path,
+      const UA_NodeId node,
       size_t* number_of_inputs,
       size_t* number_of_outputs);
   };

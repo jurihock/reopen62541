@@ -114,16 +114,32 @@ void ua::client::read(
   const std::vector<std::string>& path,
   std::function<ua::client_variable_getter_callback> getter)
 {
+  const auto node_path = UID(path, name);
+
+  const auto node_id = UA_NODEID_STRING(NS, STRINGS(node_path));
+
+  read(node_id, getter);
+}
+
+void ua::client::read(
+  const std::string& id,
+  std::function<ua::client_variable_getter_callback> getter)
+{
+  auto node = ua::convert::to_ua_node_id(id);
+
+  write(*node, getter);
+}
+
+void ua::client::read(
+  const UA_NodeId node,
+  std::function<ua::client_variable_getter_callback> getter)
+{
   UA_Variant output;
   UA_Variant_init(&output);
 
-  const auto node = UID(path, name);
-
-  const auto node_id = UA_NODEID_STRING(NS, STRINGS(node));
-
   const auto status = UA_Client_readValueAttribute(
     client_instance.get(),
-    node_id,
+    node,
     &output);
 
   if (status != UA_STATUSCODE_GOOD)
@@ -144,19 +160,35 @@ void ua::client::write(
   const std::vector<std::string>& path,
   std::function<ua::client_variable_setter_callback> setter)
 {
+  const auto node_path = UID(path, name);
+
+  const auto node_id = UA_NODEID_STRING(NS, STRINGS(node_path));
+
+  write(node_id, setter);
+}
+
+void ua::client::write(
+  const std::string& id,
+  std::function<ua::client_variable_setter_callback> setter)
+{
+  auto node = ua::convert::to_ua_node_id(id);
+
+  write(*node, setter);
+}
+
+void ua::client::write(
+  const UA_NodeId node,
+  std::function<ua::client_variable_setter_callback> setter)
+{
   UA_Variant input;
   UA_Variant_init(&input);
 
   ua::variant setter_variant(&input, 1);
   setter(setter_variant);
 
-  const auto node = UID(path, name);
-
-  const auto node_id = UA_NODEID_STRING(NS, STRINGS(node));
-
   const auto status = UA_Client_writeValueAttribute(
     client_instance.get(),
-    node_id,
+    node,
     &input);
 
   if (status != UA_STATUSCODE_GOOD)
@@ -175,9 +207,35 @@ void ua::client::call(
   std::function<ua::client_method_request_callback> request,
   std::function<ua::client_method_response_callback> response)
 {
+  const auto node_path = UID(path, name);
+  const auto parent_path = UID(path);
+
+  const auto node_id = UA_NODEID_STRING(NS, STRINGS(node_path));
+  const auto parent_id = UA_NODEID_STRING(NS, STRINGS(parent_path));
+
+  call(node_id, parent_id, request, response);
+}
+
+void ua::client::call(
+  const std::pair<std::string, std::string>& id,
+  std::function<ua::client_method_request_callback> request,
+  std::function<ua::client_method_response_callback> response)
+{
+  auto node = ua::convert::to_ua_node_id(id.first);
+  auto parent = ua::convert::to_ua_node_id(id.second);
+
+  call(*node, *parent, request, response);
+}
+
+void ua::client::call(
+  const UA_NodeId node,
+  const UA_NodeId parent,
+  std::function<ua::client_method_request_callback> request,
+  std::function<ua::client_method_response_callback> response)
+{
   size_t ninputs = 0, noutputs = 0;
 
-  get_method_nargs(name, path, &ninputs, &noutputs);
+  get_method_nargs(node, &ninputs, &noutputs);
 
   std::vector<UA_Variant> inputs(ninputs);
   for (auto& input : inputs) UA_Variant_init(&input);
@@ -188,18 +246,12 @@ void ua::client::call(
     request(request_variant);
   }
 
-  UA_Variant* outputs;
-
-  const auto node = UID(path, name);
-  const auto parent = UID(path);
-
-  const auto node_id = UA_NODEID_STRING(NS, STRINGS(node));
-  const auto parent_id = UA_NODEID_STRING(NS, STRINGS(parent));
+  UA_Variant* outputs = nullptr;
 
   const auto status = UA_Client_call(
     client_instance.get(),
-    parent_id,
-    node_id,
+    parent,
+    node,
     inputs.size(),
     inputs.data(),
     &noutputs,
@@ -207,8 +259,15 @@ void ua::client::call(
 
   if (status != UA_STATUSCODE_GOOD)
   {
-    for (auto& input : inputs) UA_Variant_clear(&input);
-    UA_Array_delete(outputs, noutputs, &UA_TYPES[UA_TYPES_VARIANT]);
+    for (auto& input : inputs)
+    {
+      UA_Variant_clear(&input);
+    }
+
+    if (outputs != nullptr)
+    {
+      UA_Array_delete(outputs, noutputs, &UA_TYPES[UA_TYPES_VARIANT]);
+    }
 
     throw ua::client_error(status);
   }
@@ -219,8 +278,15 @@ void ua::client::call(
     response(response_variant);
   }
 
-  for (auto& input : inputs) UA_Variant_clear(&input);
-  UA_Array_delete(outputs, noutputs, &UA_TYPES[UA_TYPES_VARIANT]);
+  for (auto& input : inputs)
+  {
+    UA_Variant_clear(&input);
+  }
+
+  if (outputs != nullptr)
+  {
+    UA_Array_delete(outputs, noutputs, &UA_TYPES[UA_TYPES_VARIANT]);
+  }
 }
 
 void ua::client::log_callback_handler(
@@ -252,13 +318,12 @@ void ua::client::log_callback_handler(
 }
 
 void ua::client::get_method_nargs(
-  const std::string& name,
-  const std::vector<std::string>& path,
+  const UA_NodeId node,
   size_t* number_of_inputs,
   size_t* number_of_outputs)
 {
-  const auto request_node = UID(path, name);
-  const auto request_node_id = UA_NODEID_STRING_ALLOC(NS, STRINGS(request_node)); // ALLOC
+  UA_NodeId request_node;
+  UA_NodeId_copy(&node, &request_node);
 
   UA_BrowseRequest request;
   {
@@ -267,7 +332,7 @@ void ua::client::get_method_nargs(
     request.requestedMaxReferencesPerNode = 0;
     request.nodesToBrowse = UA_BrowseDescription_new();
     request.nodesToBrowseSize = 1;
-    request.nodesToBrowse[0].nodeId = request_node_id;
+    request.nodesToBrowse[0].nodeId = request_node;
     request.nodesToBrowse[0].resultMask = UA_BROWSERESULTMASK_BROWSENAME;
   }
 
@@ -292,7 +357,7 @@ void ua::client::get_method_nargs(
 
         if (status != UA_STATUSCODE_GOOD)
         {
-          throw std::runtime_error(UA_StatusCode_name(status));
+          throw ua::client_error(status);
         }
 
         *number_of_inputs = value;
@@ -310,7 +375,7 @@ void ua::client::get_method_nargs(
 
         if (status != UA_STATUSCODE_GOOD)
         {
-          throw std::runtime_error(UA_StatusCode_name(status));
+          throw ua::client_error(status);
         }
 
         *number_of_outputs = value;

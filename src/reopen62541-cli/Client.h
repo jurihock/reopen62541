@@ -52,9 +52,18 @@ namespace UA
       array<String^>^ path);
 
     generic<class T>
+    T Get(
+      String^ id);
+
+    generic<class T>
     void Set(
       String^ name,
       array<String^>^ path,
+      T value);
+
+    generic<class T>
+    void Set(
+      String^ id,
       T value);
 
     void Read(
@@ -62,14 +71,32 @@ namespace UA
       array<String^>^ path,
       Action<UA::Variant^>^ getter);
 
+    void Read(
+      String^ id,
+      Action<UA::Variant^>^ getter);
+
     void Write(
       String^ name,
       array<String^>^ path,
       Action<UA::Variant^>^ setter);
 
+    void Write(
+      String^ id,
+      Action<UA::Variant^>^ setter);
+
     void Call(
       String^ name,
       array<String^>^ path,
+      Action<UA::Variant^>^ request,
+      Action<UA::Variant^>^ response);
+
+    void Call(
+      Tuple<String^, String^>^ id,
+      Action<UA::Variant^>^ request,
+      Action<UA::Variant^>^ response);
+
+    void Call(
+      ValueTuple<String^, String^>^ id,
       Action<UA::Variant^>^ request,
       Action<UA::Variant^>^ response);
 
