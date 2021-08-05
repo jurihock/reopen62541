@@ -2,6 +2,9 @@
 
 #include <open62541.h>
 
+#include <stdexcept>
+#include <string>
+
 namespace ua
 {
   class status_code_error : public std::exception
