@@ -13,7 +13,7 @@ list(JOIN META "\n" META)
 set(SRC "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/reopen62541")
 set(DST "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}")
 
-set(FILES convert exception strings uid argument variant client server)
+set(FILES exception convert strings uid argument variant client server)
 set(TYPES h cpp)
 
 foreach(TYPE ${TYPES})
