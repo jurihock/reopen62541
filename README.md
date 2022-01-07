@@ -157,3 +157,7 @@ client.Set&lt;int&gt;(
 </td>
 </tr>
 </table>
+
+# License
+
+This Source Code Form is subject to the terms of the Mozilla Public License 2.0. The file [LICENSE](LICENSE) contains a copy of the MPL. Alternatively obtain another one at [https://mozilla.org/MPL/2.0](https://mozilla.org/MPL/2.0).
