@@ -127,7 +127,7 @@ void ua::client::read(
 {
   auto node = ua::convert::to_ua_node_id(id);
 
-  write(*node, getter);
+  read(*node, getter);
 }
 
 void ua::client::read(
