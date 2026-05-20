@@ -6,7 +6,7 @@
 #include <reopen62541/uid.h>
 #include <reopen62541/variant.h>
 
-#include <open62541.h>
+#include <open62541/client.h>
 
 #include <cstdarg>
 #include <functional>

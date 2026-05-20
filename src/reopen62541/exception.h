@@ -1,6 +1,6 @@
 #pragma once
 
-#include <open62541.h>
+#include <open62541/types.h>
 
 #include <stdexcept>
 #include <string>

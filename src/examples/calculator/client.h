@@ -27,13 +27,18 @@ struct calculator_client : calculator_interface, ua::client
 
       const std::map<UA_LogCategory, std::string> categories
       {
-        { UA_LOGCATEGORY_NETWORK,        "network"  },
-        { UA_LOGCATEGORY_SECURECHANNEL,  "channel"  },
-        { UA_LOGCATEGORY_SESSION,        "session"  },
-        { UA_LOGCATEGORY_SERVER,         "server"   },
-        { UA_LOGCATEGORY_CLIENT,         "client"   },
-        { UA_LOGCATEGORY_USERLAND,       "userland" },
-        { UA_LOGCATEGORY_SECURITYPOLICY, "security" },
+        { UA_LOGCATEGORY_NETWORK,        "network"        },
+        { UA_LOGCATEGORY_SECURECHANNEL,  "securechannel"  },
+        { UA_LOGCATEGORY_SESSION,        "session"        },
+        { UA_LOGCATEGORY_SERVER,         "server"         },
+        { UA_LOGCATEGORY_CLIENT,         "client"         },
+        { UA_LOGCATEGORY_APPLICATION,    "application"    },
+        { UA_LOGCATEGORY_USERLAND,       "userland"       },
+        { UA_LOGCATEGORY_SECURITY,       "security"       },
+        { UA_LOGCATEGORY_SECURITYPOLICY, "securitypolicy" },
+        { UA_LOGCATEGORY_EVENTLOOP,      "eventloop"      },
+        { UA_LOGCATEGORY_PUBSUB,         "pubsub"         },
+        { UA_LOGCATEGORY_DISCOVERY,      "discovery"      },
       };
 
       std::cout << "CLIENT "

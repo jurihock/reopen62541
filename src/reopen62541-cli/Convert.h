@@ -3,7 +3,8 @@
 #define nameof(T) #T
 #define typeof(T) T::typeid
 
-#include <open62541.h>
+#include <open62541/statuscodes.h>
+#include <open62541/types.h>
 
 #include <msclr\marshal.h>
 #include <msclr\marshal_cppstd.h>

@@ -1,5 +1,7 @@
 #include <reopen62541/server.h>
 
+#include <open62541/server_config_default.h>
+
 ua::server::server(const int portnumber, const std::string& hostname, const std::string& name, const std::string& uri) :
   server_portnumber(portnumber),
   server_hostname(hostname),
@@ -13,9 +15,9 @@ ua::server::server(const int portnumber, const std::string& hostname, const std:
 
   // custom logger
   {
-    server_config->logger.log = log_callback_handler;
-    server_config->logger.context = this;
-    server_config->logger.clear = nullptr;
+    server_config->logging->log = log_callback_handler;
+    server_config->logging->context = this;
+    server_config->logging->clear = nullptr;
   }
 
   const auto status = UA_ServerConfig_setMinimal(server_config, portnumber, nullptr);
@@ -27,14 +29,15 @@ ua::server::server(const int portnumber, const std::string& hostname, const std:
 
   // custom configs
   {
-    UA_String_deleteMembers(&server_config->customHostname);
-    server_config->customHostname = UA_STRING_ALLOC(STRINGS(hostname)); // ALLOC
+    // TODO customHostname
+    // UA_String_clear(&server_config->customHostname);
+    // server_config->customHostname = UA_STRING_ALLOC(STRINGS(hostname)); // ALLOC
 
-    UA_String_deleteMembers(&server_config->applicationDescription.applicationName.locale);
-    UA_String_deleteMembers(&server_config->applicationDescription.applicationName.text);
+    UA_String_clear(&server_config->applicationDescription.applicationName.locale);
+    UA_String_clear(&server_config->applicationDescription.applicationName.text);
     server_config->applicationDescription.applicationName = UA_LOCALIZEDTEXT_ALLOC(LC, STRINGS(name)); // ALLOC
 
-    UA_String_deleteMembers(&server_config->applicationDescription.applicationUri);
+    UA_String_clear(&server_config->applicationDescription.applicationUri);
     server_config->applicationDescription.applicationUri = UA_STRING_ALLOC(STRINGS(uri)); // ALLOC
   }
 
@@ -42,15 +45,17 @@ ua::server::server(const int portnumber, const std::string& hostname, const std:
   // https://github.com/open62541/open62541/issues/1175
   for (size_t i = 0; i < server_config->endpointsSize; ++i)
   {
-    UA_String_deleteMembers(&server_config->endpoints[i].server.applicationName.locale);
-    UA_String_deleteMembers(&server_config->endpoints[i].server.applicationName.text);
+    UA_String_clear(&server_config->endpoints[i].server.applicationName.locale);
+    UA_String_clear(&server_config->endpoints[i].server.applicationName.text);
     server_config->endpoints[i].server.applicationName = UA_LOCALIZEDTEXT_ALLOC(LC, STRINGS(name)); // ALLOC
 
-    UA_String_deleteMembers(&server_config->endpoints[i].server.applicationUri);
+    UA_String_clear(&server_config->endpoints[i].server.applicationUri);
     server_config->endpoints[i].server.applicationUri = UA_STRING_ALLOC(STRINGS(uri)); // ALLOC
   }
 
   // check namespace index
+  // TODO error 0x803e0000
+  if (false)
   {
     size_t ns;
 
@@ -479,20 +484,21 @@ void ua::server::log_callback_handler(
     return;
   }
 
-  std::va_list argscopy;
-  va_copy(argscopy, args);
+  UA_String buffer = UA_STRING_NULL;
 
-  const auto length = std::vsnprintf(nullptr, 0, format, argscopy) + 1; // incl. \0
+  UA_String_vformat(&buffer, format, args);
 
-  std::vector<char> buffer(length, 0);
-  std::vsnprintf(buffer.data(), length, format, args);
-
-  const std::string message(buffer.begin(), buffer.end());
-
-  for (const auto& log : static_cast<ua::server*>(context)->server_log_callbacks)
+  if (buffer.data != nullptr && buffer.length != 0)
   {
-    log(level, category, message);
-  }
+    const std::string message(reinterpret_cast<char*>(buffer.data), buffer.length);
+
+    for (const auto& log : static_cast<ua::server*>(context)->server_log_callbacks)
+    {
+      log(level, category, message);
+    }
+  } 
+
+  UA_String_clear(&buffer); 
 }
 
 UA_StatusCode ua::server::variable_getter_callback_handler(
@@ -503,12 +509,12 @@ UA_StatusCode ua::server::variable_getter_callback_handler(
   const UA_NumericRange* range,
   UA_DataValue* value)
 {
-  if (UA_Server_getConfig(server)->logger.context == nullptr)
+  if (UA_Server_getConfig(server)->logging->context == nullptr)
   {
     return UA_STATUSCODE_BADUNEXPECTEDERROR;
   }
 
-  const auto context = static_cast<ua::server*>(UA_Server_getConfig(server)->logger.context);
+  const auto context = static_cast<ua::server*>(UA_Server_getConfig(server)->logging->context);
   const auto node = ua::convert::to_string(variableId->identifier.string);
 
   try
@@ -556,12 +562,12 @@ UA_StatusCode ua::server::variable_setter_callback_handler(
   const UA_NumericRange* range,
   const UA_DataValue* value)
 {
-  if (UA_Server_getConfig(server)->logger.context == nullptr)
+  if (UA_Server_getConfig(server)->logging->context == nullptr)
   {
     return UA_STATUSCODE_BADUNEXPECTEDERROR;
   }
 
-  const auto context = static_cast<ua::server*>(UA_Server_getConfig(server)->logger.context);
+  const auto context = static_cast<ua::server*>(UA_Server_getConfig(server)->logging->context);
   const auto node = ua::convert::to_string(variableId->identifier.string);
 
   try
@@ -608,12 +614,12 @@ UA_StatusCode ua::server::method_callback_handler(
   size_t inputSize, const UA_Variant* input,
   size_t outputSize, UA_Variant* output)
 {
-  if (UA_Server_getConfig(server)->logger.context == nullptr)
+  if (UA_Server_getConfig(server)->logging->context == nullptr)
   {
     return UA_STATUSCODE_BADUNEXPECTEDERROR;
   }
 
-  const auto context = static_cast<ua::server*>(UA_Server_getConfig(server)->logger.context);
+  const auto context = static_cast<ua::server*>(UA_Server_getConfig(server)->logging->context);
   const auto node = ua::convert::to_string(methodId->identifier.string);
 
   try

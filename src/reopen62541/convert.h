@@ -2,7 +2,8 @@
 
 #include <reopen62541/exception.h>
 
-#include <open62541.h>
+#include <open62541/statuscodes.h>
+#include <open62541/types.h>
 
 #include <codecvt>
 #include <memory>

@@ -2,7 +2,7 @@
 
 #include <reopen62541/convert.h>
 
-#include <open62541.h>
+#include <open62541/types.h>
 
 #include <string>
 #include <vector>
@@ -319,7 +319,7 @@ namespace ua
         const auto src = value + '\0';
         auto dst = UA_String_fromChars(src.c_str());
         UA_Variant_setScalarCopy(variant, &dst, &UA_TYPES[UA_TYPES_STRING]);
-        UA_String_deleteMembers(&dst);
+        UA_String_clear(&dst);
       }
 
       else if constexpr (std::is_same<T, std::wstring>::value)
@@ -327,7 +327,7 @@ namespace ua
         const auto src = ua::convert::to_string(value) + '\0';
         auto dst = UA_String_fromChars(src.c_str());
         UA_Variant_setScalarCopy(variant, &dst, &UA_TYPES[UA_TYPES_STRING]);
-        UA_String_deleteMembers(&dst);
+        UA_String_clear(&dst);
       }
 
       // VECTORS
@@ -388,7 +388,7 @@ namespace ua
 
         for (size_t i = 0; i < copy.size(); ++i)
         {
-          UA_String_deleteMembers(&copy[i]);
+          UA_String_clear(&copy[i]);
         }
       }
 
@@ -408,7 +408,7 @@ namespace ua
 
         for (size_t i = 0; i < copy.size(); ++i)
         {
-          UA_String_deleteMembers(&copy[i]);
+          UA_String_clear(&copy[i]);
         }
       }
 

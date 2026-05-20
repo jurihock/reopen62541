@@ -3,7 +3,7 @@
 #include <reopen62541/convert.h>
 #include <reopen62541/strings.h>
 
-#include <open62541.h>
+#include <open62541/types.h>
 
 #include <string>
 #include <vector>

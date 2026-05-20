@@ -1,6 +1,6 @@
 #pragma once
 
-#include <open62541.h>
+#include <open62541/plugin/log.h>
 
 #include <string>
 
@@ -15,23 +15,28 @@ namespace UA
 
   public enum class LogLevel
   {
-    Trace = UA_LOGLEVEL_TRACE,
-    Debug = UA_LOGLEVEL_DEBUG,
-    Info = UA_LOGLEVEL_INFO,
+    Trace   = UA_LOGLEVEL_TRACE,
+    Debug   = UA_LOGLEVEL_DEBUG,
+    Info    = UA_LOGLEVEL_INFO,
     Warning = UA_LOGLEVEL_WARNING,
-    Error = UA_LOGLEVEL_ERROR,
-    Fatal = UA_LOGLEVEL_FATAL,
+    Error   = UA_LOGLEVEL_ERROR,
+    Fatal   = UA_LOGLEVEL_FATAL,
   };
 
   public enum class LogCategory
   {
-    Network = UA_LOGCATEGORY_NETWORK,
-    SecureChannel = UA_LOGCATEGORY_SECURECHANNEL,
-    Session = UA_LOGCATEGORY_SESSION,
-    Server = UA_LOGCATEGORY_SERVER,
-    Client = UA_LOGCATEGORY_CLIENT,
-    Userland = UA_LOGCATEGORY_USERLAND,
+    Network        = UA_LOGCATEGORY_NETWORK,
+    SecureChannel  = UA_LOGCATEGORY_SECURECHANNEL,
+    Session        = UA_LOGCATEGORY_SESSION,
+    Server         = UA_LOGCATEGORY_SERVER,
+    Client         = UA_LOGCATEGORY_CLIENT,
+    Application    = UA_LOGCATEGORY_APPLICATION,
+    Userland       = UA_LOGCATEGORY_USERLAND,
+    Security       = UA_LOGCATEGORY_SECURITY,
     SecurityPolicy = UA_LOGCATEGORY_SECURITYPOLICY,
+    EventLoop      = UA_LOGCATEGORY_EVENTLOOP,
+    PubSub         = UA_LOGCATEGORY_PUBSUB,
+    Discovery      = UA_LOGCATEGORY_DISCOVERY
   };
 
   public ref class LogEventArgs : EventArgs
